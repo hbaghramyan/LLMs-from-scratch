@@ -119,3 +119,9 @@ ______________________________________
 To discuss
 
 1. vocab = {idx: bytes([idx]) for idx in range(256)} why square brackets in bytes([idx])
+
+26/04/2024 -
+
+1. օնլայն գրքից - A7, A8, Chapter 3 - 3.1, 3.2, 3.3.1
+2. from the Course - Unit 3.1, 3.2
+3. Հավանականության գրքից - 12 - 14
