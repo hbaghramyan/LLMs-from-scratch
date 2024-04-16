@@ -1,8 +1,8 @@
 # making the training text longer to have more representative token statistics
 # text from https://www.reedbeta.com/blog/programmers-intro-to-unicode/
-from utils import get_stats, merge
+from utils import get_stats, merge, decode, encode
 
-with open(r"ch02/01_main-chapter-code/unicode.txt", "r", encoding="utf-8") as f:
+with open(r"ch02/bpe_karpathy/unicode.txt", "r", encoding="utf-8") as f:
     TEXT = f.read()
 
 TOKENS = TEXT.encode("utf-8")
@@ -25,3 +25,11 @@ for i in range(num_merges):
 print("tokens length:", len(TOKENS))
 print("ids length:", len(ids))
 print(f"compression ratio: {len(TOKENS) / len(ids):.2f}X")
+
+vocab = {idx: bytes([idx]) for idx in range(256)}
+for (p0, p1), idx in merges.items():
+    vocab[idx] = vocab[p0] + vocab[p1]
+
+print(decode([128], vocab))
+
+print(encode("Hello world!", merges))

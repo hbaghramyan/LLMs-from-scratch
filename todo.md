@@ -116,3 +116,6 @@ ______________________________________
 
 Հավանականության գրքից վերցրու 6-11 խնդիրները:
 
+To discuss
+
+1. vocab = {idx: bytes([idx]) for idx in range(256)} why square brackets in bytes([idx])
