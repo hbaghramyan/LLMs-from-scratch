@@ -125,3 +125,14 @@ To discuss
 1. օնլայն գրքից - A7, A8, Chapter 3 - 3.1, 3.2, 3.3.1
 2. from the Course - Unit 3.1, 3.2
 3. Հավանականության գրքից - 12 - 14
+
+To discuss
+
+29/04/2024 - 
+
+
+1. https://stats.stackexchange.com/questions/338285/how-does-the-subtraction-of-the-logit-maximum-improve-learning
+2. https://datascience.stackexchange.com/questions/23159/in-softmax-classifier-why-use-exp-function-to-do-normalization - second response only
+3. https://en.wikipedia.org/wiki/Entropy_(information_theory) - till the example inclusive
+4. օնլայն գրքից - A7, A8, Chapter 3 - 3.3.2
+5. from the Course - 3.3
