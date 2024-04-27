@@ -52,7 +52,7 @@ test_loader = DataLoader(
     num_workers=0
 )
 
-for i in range(3):
-    for idx, (x, y) in enumerate(train_loader):
-        print(f"Batch {idx+1}:", x, y)
+# for i in range(3):
+#     for idx, (x, y) in enumerate(train_loader):
+#         print(f"Batch {idx+1}:", x, y)
     #torch.manual_seed(123)

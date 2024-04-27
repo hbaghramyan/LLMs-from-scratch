@@ -21,12 +21,12 @@ class NeuralNetwork(torch.nn.Module):
         return logits
 
 
-torch.manual_seed(123)
-model = NeuralNetwork(50, 3)
-X = torch.rand((1, 50))
-with torch.no_grad():
-    out = torch.softmax(model(X), dim=1)
-print(out)
+# torch.manual_seed(123)
+# model = NeuralNetwork(50, 3)
+# X = torch.rand((1, 50))
+# with torch.no_grad():
+#     out = torch.softmax(model(X), dim=1)
+# print(out)
 
-num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-print("Total number of trainable model parameters:", num_params)
+# num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+# print("Total number of trainable model parameters:", num_params)
