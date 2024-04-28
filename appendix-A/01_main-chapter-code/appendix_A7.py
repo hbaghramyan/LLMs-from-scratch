@@ -1,8 +1,8 @@
 import torch
 import torch.nn.functional as F
 
-from appendix_A5 import NeuralNetwork
-from appendix_A6 import train_loader
+from appendix_utils import NeuralNetwork, train_loader, test_loader, compute_accuracy
+from appendix_utils import X_train, y_train
 
 torch.manual_seed(123)
 model = NeuralNetwork(num_inputs=2, num_outputs=2)
@@ -33,3 +33,22 @@ for epoch in range(num_epochs):
 
     model.eval()
     # Optional model evaluation
+
+num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+print("Total number of trainable model parameters:", num_params)
+
+model.eval()
+with torch.no_grad():
+    outputs = model(X_train)
+print(outputs)
+
+torch.set_printoptions(sci_mode=False)
+probas = torch.softmax(outputs, dim=1)
+print(probas)
+
+predictions = torch.argmax(outputs, dim=1)
+print(predictions)
+
+print(torch.sum(predictions == y_train))
+
+print(compute_accuracy(model, test_loader))
