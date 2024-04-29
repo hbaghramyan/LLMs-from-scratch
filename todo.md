@@ -136,3 +136,12 @@ To discuss
 3. https://en.wikipedia.org/wiki/Entropy_(information_theory) - till the example inclusive
 4. օնլայն գրքից - A7, A8, Chapter 3 - 3.3.2
 5. from the Course - 3.3
+
+To discuss
+1. all_context_vecs = attn_weights @ inputs
+    print(all_context_vecs)
+2. def compute_accuracy(model, dataloader):
+
+    model = model.eval() - this doesn't required
+
+3. torch.isclose(context_vec_2, all_context_vecs[1, :], atol=1e-4, rtol=0)
