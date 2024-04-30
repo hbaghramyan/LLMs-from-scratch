@@ -48,7 +48,7 @@ enc_sample = enc_text[50:]
 context_size = 4
 
 x = enc_text[:context_size]
-y = enc_text[1:context_size + 1]
+y = enc_text[1 : context_size + 1]
 
 print(f"x: {x}")
 print(f"y:      {y}")
