@@ -36,7 +36,6 @@ integers = tokenizer_bpt.encode(text, allowed_special={"<|endoftext|>"})
 string = tokenizer_bpt.decode(integers)
 print(string)
 
-# 2.6 Data sampling with a sliding window
 
 with open(r"ch02/01_main-chapter-code/the-verdict.txt", "r", encoding="utf-8") as f:
     raw_text = f.read()
