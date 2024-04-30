@@ -1,7 +1,8 @@
 import torch
 import torch.nn.functional as F
 
-from appendix_utils import NeuralNetwork, train_loader, test_loader, compute_accuracy
+from appendix_utils import NeuralNetwork, train_loader, test_loader
+from appendix_utils import compute_accuracy
 from appendix_utils import X_train, y_train
 
 torch.manual_seed(123)
@@ -24,7 +25,7 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
 
-        ### LOGGING
+        # LOGGING
         print(
             f"Epoch: {epoch+1:03d}/{num_epochs:03d}"
             f"  |  Batch {batch_idx:03d}/{len(train_loader):03d}"

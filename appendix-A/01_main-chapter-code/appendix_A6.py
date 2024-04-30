@@ -41,4 +41,5 @@ train_loader = DataLoader(
     dataset=train_ds, batch_size=2, shuffle=True, num_workers=0, drop_last=True
 )
 
-test_loader = DataLoader(dataset=test_ds, batch_size=2, shuffle=False, num_workers=0)
+test_loader = DataLoader(dataset=test_ds, batch_size=2, shuffle=False,
+                         num_workers=0)
