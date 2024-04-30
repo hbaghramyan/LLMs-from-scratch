@@ -1,16 +1,22 @@
-name: Code tests
+name: Code tests (Linux)
 
 on:
   push:
     branches: [ main ]
     paths:
-      - '**/*.py'   # Run workflow for changes in Python files
-      - '**/*.ipynb' # Run workflow for changes in Jupyter notebooks
+      - '**/*.py'    # Run workflow for changes in Python files
+      - '**/*.ipynb'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/*.sh'
   pull_request:
     branches: [ main ]
     paths:
       - '**/*.py'
       - '**/*.ipynb'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/*.sh'
 
 jobs:
   test:
