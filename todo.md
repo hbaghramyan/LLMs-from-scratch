@@ -153,3 +153,4 @@ To discuss
 1. https://www.youtube.com/watch?v=zduSFxRajkE&t=2266s էս վիդեոն շարունակել մինչև 01:25:28
 2. օնլայն գրքից Chapter 3 - 3.4, Appendix 9.1, 9.2 - սրա համար https://colab.research.google.com/ պետք ա օգտագործես, enter runtime and choose the accelerator to be T4 GPU
 3. Հավանականության գրքից - 1.5 առանց խնդիրները լուծելու
+4. from the Course - 3.4
