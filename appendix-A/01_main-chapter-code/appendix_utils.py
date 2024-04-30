@@ -17,6 +17,7 @@ X_test = torch.tensor(
 
 y_test = torch.tensor([0, 1])
 
+
 class ToyDataset(Dataset):
     def __init__(self, X, y):
         self.features = X
@@ -37,19 +38,11 @@ test_ds = ToyDataset(X_test, y_test)
 torch.manual_seed(123)
 
 train_loader = DataLoader(
-    dataset=train_ds,
-    batch_size=2,
-    shuffle=True,
-    num_workers=0,
-    drop_last=True
+    dataset=train_ds, batch_size=2, shuffle=True, num_workers=0, drop_last=True
 )
 
-test_loader = DataLoader(
-    dataset=test_ds,
-    batch_size=2,
-    shuffle=False,
-    num_workers=0
-)
+test_loader = DataLoader(dataset=test_ds, batch_size=2, shuffle=False, num_workers=0)
+
 
 class NeuralNetwork(torch.nn.Module):
     def __init__(self, num_inputs, num_outputs):
@@ -69,6 +62,7 @@ class NeuralNetwork(torch.nn.Module):
     def forward(self, x):
         logits = self.layers(x)
         return logits
+
 
 def compute_accuracy(model, dataloader):
 

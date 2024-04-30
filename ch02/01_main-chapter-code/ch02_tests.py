@@ -49,7 +49,7 @@ enc_sample = enc_text[50:]
 context_size = 4
 
 x = enc_text[:context_size]
-y = enc_text[1:context_size + 1]
+y = enc_text[1 : context_size + 1]
 
 print(f"x: {x}")
 print(f"y:      {y}")
@@ -66,7 +66,9 @@ vocab_size = 50257
 token_embedding_layer = torch.nn.EmbeddingBag(vocab_size, output_dim)
 
 max_length = 4
-dataloader = create_dataloader(raw_text, batch_size=8, max_length=max_length, stride=5, shuffle=False)
+dataloader = create_dataloader(
+    raw_text, batch_size=8, max_length=max_length, stride=5, shuffle=False
+)
 data_iter = iter(dataloader)
 inputs, targets = next(data_iter)
 print("Inputs:\n", inputs)

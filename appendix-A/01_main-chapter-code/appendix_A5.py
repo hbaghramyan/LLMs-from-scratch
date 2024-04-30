@@ -19,4 +19,3 @@ class NeuralNetwork(torch.nn.Module):
     def forward(self, x):
         logits = self.layers(x)
         return logits
-

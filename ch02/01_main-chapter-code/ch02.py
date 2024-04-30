@@ -21,7 +21,9 @@ vocab_size = 50257
 token_embedding_layer = torch.nn.Embedding(vocab_size, output_dim)
 
 max_length = 4
-dataloader = create_dataloader(raw_text, batch_size=8, max_length=max_length, stride=5, shuffle=False)
+dataloader = create_dataloader(
+    raw_text, batch_size=8, max_length=max_length, stride=5, shuffle=False
+)
 data_iter = iter(dataloader)
 inputs, targets = next(data_iter)
 
