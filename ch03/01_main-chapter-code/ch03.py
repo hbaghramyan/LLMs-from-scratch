@@ -36,17 +36,6 @@ for i, x_i in enumerate(inputs):
     attn_scores_2[i] = torch.dot(x_i, query)
 print(attn_scores_2)
 
-# attn_weights_2_tmp = attn_scores_2 / attn_scores_2.sum()
-# print("Attention weights:", attn_weights_2_tmp)
-# print("Sum", attn_weights_2_tmp.sum())
-
-# def softmax_naive(x):
-#     return torch.exp(x) / torch.exp(x).sum(dim=0)
-
-# attn_weights_2_naive = softmax_naive(attn_scores_2)
-# print("Attention weights:", attn_weights_2_naive)
-# print("Sum:", attn_weights_2_naive)
-
 attn_weights_2 = torch.softmax(attn_scores_2, dim=0)
 print("Attention weights:", attn_weights_2)
 print("Sum:", attn_weights_2.sum())
@@ -55,4 +44,30 @@ query = inputs[1]  # 2nd input token is the query
 context_vec_2 = torch.zeros(query.shape)
 for i, x_i in enumerate(inputs):
     context_vec_2 += attn_weights_2[i] * x_i
+print(context_vec_2)
+
+x_2 = inputs[1]
+d_in = inputs.shape[1]
+d_out = 2
+
+torch.manual_seed(123)
+W_query = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
+W_key = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
+W_value = torch.nn.Parameter(torch.rand(d_in, d_out), requires_grad=False)
+
+query_2 = x_2 @ W_query
+
+keys = inputs @ W_key
+values = inputs @ W_value
+print("keys.shape:", keys.shape)
+print("values.shape:", values.shape)
+
+attn_scores_2 = query_2 @ keys.T  # All attention scores for given query
+print(attn_scores_2)
+
+d_k = keys.shape[-1]
+attn_weights_2 = torch.softmax(attn_scores_2 / d_k**0.5, dim=-1)
+print(attn_weights_2)
+
+context_vec_2 = attn_weights_2 @ values
 print(context_vec_2)
