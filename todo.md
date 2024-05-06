@@ -154,3 +154,7 @@ To discuss
 2. օնլայն գրքից Chapter 3 - 3.4, Appendix 9.1, 9.2 - սրա համար https://colab.research.google.com/ պետք ա օգտագործես, enter runtime and choose the accelerator to be T4 GPU
 3. Հավանականության գրքից - 1.5 առանց խնդիրները լուծելու
 4. from the Course - 3.4
+
+To discuss
+
+1. torch.sum(attn_weights, dim=0)
