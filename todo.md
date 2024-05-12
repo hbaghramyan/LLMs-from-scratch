@@ -163,4 +163,61 @@ To discuss
 
 1. օնլայն գրքից Chapter 3 - 3.4, 3.5.1
 2. Հավանականության գրքից - 1.5 պարագրաֆի 1-6 խնդիրները
-3. from the Course - 3.6
+3. from the Course - 3.5
+
+To discuss
+
+1. why the dimensions should be (3, 5) for the weight. Can you show it with matrix multiplications?
+
+Sure! I'll explain why the weight matrix in a `nn.Linear` layer has the shape `(3, 5)` for transforming an input of `5` dimensions into an output of `3` dimensions, using matrix multiplication as the basis.
+
+### The Setup
+
+- **Input Dimensions (`d_in`)**: 5
+- **Output Dimensions (`d_out`)**: 3
+
+### Linear Transformation in Neural Networks
+
+In neural networks, a linear transformation can be represented as:
+
+\[ Y = XW^T \]
+
+where:
+- \( X \) is the input matrix.
+- \( W \) is the weight matrix.
+- \( Y \) is the output matrix after applying the linear transformation.
+
+### Shapes of the Matrices
+
+1. **Input Matrix \( X \)**:
+   - Shape: `(batch_size, d_in)`
+   - Example: For a batch size of 2, \( X \) has shape `(2, 5)`.
+
+2. **Weight Matrix \( W \)**:
+   - The rows of \( W \) represent the output features, and the columns represent the input features.
+   - Shape: `(d_out, d_in)`
+   - Example: \( W \) has shape `(3, 5)`.
+
+3. **Output Matrix \( Y \)**:
+   - Shape: `(batch_size, d_out)`
+   - Example: For a batch size of 2, \( Y \) has shape `(2, 3)`.
+
+### Matrix Multiplication
+
+Given the shapes:
+- \( X \) is `(2, 5)`
+- \( W \) is `(3, 5)`
+
+To multiply \( X \) and \( W \), and align the dimensions for valid matrix multiplication (where the inner dimensions must match), \( W \) must be transposed. Therefore, \( W^T \) (the transpose of \( W \)) is `(5, 3)`.
+
+Now, the matrix multiplication \( XW^T \) works as follows:
+- \( X \) has shape `(2, 5)`
+- \( W^T \) has shape `(5, 3)`
+
+The result \( Y \) after multiplication will then have the shape `(2, 3)`, fitting our expectation of the output dimensions.
+
+### Conclusion
+
+The reason the weight matrix \( W \) in `nn.Linear` is initialized with the shape `(d_out, d_in)` (in this example, `(3, 5)`) is so that its transpose \( W^T \) aligns correctly with the input \( X \) for matrix multiplication. This transpose operation is part of the underlying mechanics in many neural network frameworks, including PyTorch, to facilitate straightforward linear transformations using matrix multiplication.
+
+I hope this clarifies the rationale behind the dimensions of the weight matrix in PyTorch's `nn.Linear` layer!

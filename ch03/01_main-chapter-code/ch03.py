@@ -79,5 +79,11 @@ sa_v1 = SelfAttention_v1(d_in, d_out)
 print(sa_v1(inputs))
 
 torch.manual_seed(123)
-sa_v1 = SelfAttention_v2(d_in, d_out)
+sa_v2 = SelfAttention_v2(d_in, d_out)
+print(sa_v2(inputs))
+
+sa_v1.W_query = torch.nn.Parameter(sa_v2.W_query.weight.T)
+sa_v1.W_key = torch.nn.Parameter(sa_v2.W_key.weight.T)
+sa_v1.W_value = torch.nn.Parameter(sa_v2.W_value.weight.T)
+
 print(sa_v1(inputs))
