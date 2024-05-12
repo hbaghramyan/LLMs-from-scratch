@@ -221,3 +221,7 @@ The result \( Y \) after multiplication will then have the shape `(2, 3)`, fitti
 The reason the weight matrix \( W \) in `nn.Linear` is initialized with the shape `(d_out, d_in)` (in this example, `(3, 5)`) is so that its transpose \( W^T \) aligns correctly with the input \( X \) for matrix multiplication. This transpose operation is part of the underlying mechanics in many neural network frameworks, including PyTorch, to facilitate straightforward linear transformations using matrix multiplication.
 
 I hope this clarifies the rationale behind the dimensions of the weight matrix in PyTorch's `nn.Linear` layer!
+
+2. dim=-1
+
+3. see scaling_rationale.py
