@@ -225,3 +225,9 @@ I hope this clarifies the rationale behind the dimensions of the weight matrix i
 2. dim=-1
 
 3. see scaling_rationale.py
+
+27/05/2024 - 
+
+1. օնլայն գրքից Chapter 3 - վերջացնել, չմոռանաս առաջադրանքները
+2. from the Course - 3.6, 3.7 առանց առաջադրանքների
+3. Հավանականության գրքից - 1.5 պարագրաֆի 7-11 խնդիրները
