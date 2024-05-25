@@ -350,9 +350,7 @@ if __name__ == "__main__":
         }
         model = GPTModel(BASE_CONFIG)
         model.eval()
-
         device = "cpu"
-        model.to(device)
 
     # Code as it is used in the main chapter
     else:
@@ -375,15 +373,18 @@ if __name__ == "__main__":
 
         BASE_CONFIG.update(model_configs[CHOOSE_MODEL])
 
+        assert train_dataset.max_length <= BASE_CONFIG["context_length"], (
+            f"Dataset length {train_dataset.max_length} exceeds model's context "
+            f"length {BASE_CONFIG['context_length']}. Reinitialize data sets with "
+            f"`max_length={BASE_CONFIG['context_length']}`"
+        )
+
         model_size = CHOOSE_MODEL.split(" ")[-1].lstrip("(").rstrip(")")
         settings, params = download_and_load_gpt2(model_size=model_size, models_dir="gpt2")
 
         model = GPTModel(BASE_CONFIG)
         load_weights_into_gpt(model, params)
-        model.eval()
-
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model.to(device)
 
     ########################################
     # Modify and pretrained model
@@ -396,6 +397,7 @@ if __name__ == "__main__":
 
     num_classes = 2
     model.out_head = torch.nn.Linear(in_features=BASE_CONFIG["emb_dim"], out_features=num_classes)
+    model.to(device)
 
     for param in model.trf_blocks[-1].parameters():
         param.requires_grad = True
