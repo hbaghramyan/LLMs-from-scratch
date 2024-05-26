@@ -1,6 +1,11 @@
 import torch
 
-from utils_ch03 import SelfAttention_v1, SelfAttention_v2
+from utils_ch03 import (
+    CasualAttention,
+    MultiHeadAttentionWrapper,
+    SelfAttention_v1,
+    SelfAttention_v2,
+)
 
 inputs = torch.tensor(
     [
@@ -105,3 +110,30 @@ print(masked)
 
 attn_weights = torch.softmax(masked / keys.shape[-1] ** 0.5, dim=-1)
 print(attn_weights)
+
+torch.manual_seed(123)
+dropout = torch.nn.Dropout(0.5)
+example = torch.ones(6, 6)
+print(dropout(example))
+
+torch.manual_seed(123)
+print(dropout(attn_weights))
+
+batch = torch.stack((inputs, inputs), dim=0)
+print(batch.shape)
+
+torch.manual_seed(123)
+context_length = batch.shape[1]
+ca = CasualAttention(d_in, d_out, context_length, 0.0)
+context_vecs = ca(batch)
+print("context_vecs.shape:", context_vecs.shape)
+
+
+torch.manual_seed(123)
+context_length = batch.shape[1]  # This is the number of tokens
+d_in, d_out = 3, 2
+mha = MultiHeadAttentionWrapper(d_in, d_out, context_length, 0.0, num_heads=2)
+context_vecs = mha(batch)
+
+print(context_vecs)
+print("context_vecs.shape:", context_vecs.shape)
