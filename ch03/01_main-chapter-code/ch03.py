@@ -2,6 +2,7 @@ import torch
 
 from utils_ch03 import (
     CasualAttention,
+    MultiHeadAttention,
     MultiHeadAttentionWrapper,
     SelfAttention_v1,
     SelfAttention_v2,
@@ -133,6 +134,17 @@ torch.manual_seed(123)
 context_length = batch.shape[1]  # This is the number of tokens
 d_in, d_out = 3, 2
 mha = MultiHeadAttentionWrapper(d_in, d_out, context_length, 0.0, num_heads=2)
+context_vecs = mha(batch)
+
+print(context_vecs)
+print("context_vecs.shape:", context_vecs.shape)
+
+torch.manual_seed(123)
+
+batch_size, context_length, d_in = batch.shape
+d_out = 2
+mha = MultiHeadAttention(d_in, d_out, context_length, 0.0, num_heads=2)
+
 context_vecs = mha(batch)
 
 print(context_vecs)
