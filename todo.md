@@ -242,3 +242,7 @@ I hope this clarifies the rationale behind the dimensions of the weight matrix i
 2. from the Course - 3.6, 3.7 առանց առաջադրանքների
 3. https://huggingface.co/learn/nlp-course/en/chapter6/2?fw=pt սա հայերենի համար ա
 3. Հավանականության գրքից - 1.5 պարագրաֆի 7-11 խնդիրները
+
+### 10/06/2024 -
+
+մնում են նույնը ինչ անցած հանդիպմանը
