@@ -249,3 +249,7 @@ I hope this clarifies the rationale behind the dimensions of the weight matrix i
 
 to discuss
  1. each self.heads is an instance of CausalAttention
+
+ ### 17/06/2024 -
+
+մնում են նույնը ինչ անցած հանդիպմանը
