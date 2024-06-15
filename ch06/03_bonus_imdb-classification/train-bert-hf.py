@@ -16,9 +16,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 
 class IMDBDataset(Dataset):
-    def __init__(
-        self, csv_file, tokenizer, max_length=None, pad_token_id=50256
-    ):
+    def __init__(self, csv_file, tokenizer, max_length=None, pad_token_id=50256):
         self.data = pd.read_csv(csv_file)
         self.max_length = (
             max_length
@@ -28,8 +26,7 @@ class IMDBDataset(Dataset):
 
         # Pre-tokenize texts
         self.encoded_texts = [
-            tokenizer.encode(text)[: self.max_length]
-            for text in self.data["text"]
+            tokenizer.encode(text)[: self.max_length] for text in self.data["text"]
         ]
         # Pad sequences to the longest sequence
 
@@ -97,16 +94,12 @@ def calc_accuracy_loader(data_loader, model, device, num_batches=None):
         num_batches = min(num_batches, len(data_loader))
     for i, (input_batch, target_batch) in enumerate(data_loader):
         if i < num_batches:
-            input_batch, target_batch = input_batch.to(
-                device
-            ), target_batch.to(device)
+            input_batch, target_batch = input_batch.to(device), target_batch.to(device)
             # logits = model(input_batch)[:, -1, :]  # Logits of last output token
             logits = model(input_batch).logits
             predicted_labels = torch.argmax(logits, dim=1)
             num_examples += predicted_labels.shape[0]
-            correct_predictions += (
-                (predicted_labels == target_batch).sum().item()
-            )
+            correct_predictions += (predicted_labels == target_batch).sum().item()
         else:
             break
     return correct_predictions / num_examples
@@ -118,9 +111,7 @@ def evaluate_model(model, train_loader, val_loader, device, eval_iter):
         train_loss = calc_loss_loader(
             train_loader, model, device, num_batches=eval_iter
         )
-        val_loss = calc_loss_loader(
-            val_loader, model, device, num_batches=eval_iter
-        )
+        val_loss = calc_loss_loader(val_loader, model, device, num_batches=eval_iter)
     model.train()
     return train_loss, val_loss
 
@@ -134,7 +125,6 @@ def train_classifier_simple(
     num_epochs,
     eval_freq,
     eval_iter,
-    tokenizer,
     max_steps=None,
 ):
     # Initialize lists to track losses and tokens seen
@@ -195,17 +185,13 @@ if __name__ == "__main__":
         "--trainable_layers",
         type=str,
         default="last_block",
-        help=(
-            "Which layers to train. Options: 'all', 'last_block', 'last_layer'."
-        ),
+        help=("Which layers to train. Options: 'all', 'last_block', 'last_layer'."),
     )
     parser.add_argument(
         "--bert_model",
         type=str,
         default="distilbert",
-        help=(
-            "Which layers to train. Options: 'all', 'last_block', 'last_layer'."
-        ),
+        help=("Which layers to train. Options: 'all', 'last_block', 'last_layer'."),
     )
     args = parser.parse_args()
 
@@ -241,9 +227,7 @@ if __name__ == "__main__":
         model = AutoModelForSequenceClassification.from_pretrained(
             "FacebookAI/roberta-large", num_labels=2
         )
-        model.classifier.out_proj = torch.nn.Linear(
-            in_features=1024, out_features=2
-        )
+        model.classifier.out_proj = torch.nn.Linear(in_features=1024, out_features=2)
 
         if args.trainable_layers == "last_layer":
             pass
@@ -325,9 +309,7 @@ if __name__ == "__main__":
 
     start_time = time.time()
     torch.manual_seed(123)
-    optimizer = torch.optim.AdamW(
-        model.parameters(), lr=5e-5, weight_decay=0.1
-    )
+    optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5, weight_decay=0.1)
 
     num_epochs = 3
     train_losses, val_losses, train_accs, val_accs, examples_seen = (
@@ -340,7 +322,6 @@ if __name__ == "__main__":
             num_epochs=num_epochs,
             eval_freq=50,
             eval_iter=20,
-            tokenizer=tokenizer,
             max_steps=None,
         )
     )
