@@ -38,7 +38,7 @@ class SelfAttention_v2(nn.Module):
 
 class CasualAttention(SelfAttention_v2):
     def __init__(self, d_in, d_out, context_length, dropout, qkv_bias=False):
-        super().__init__(d_in, d_out, qkv_bias=False)
+        super().__init__(d_in, d_out, qkv_bias)
         self.dropout = nn.Dropout(dropout)
         self.register_buffer(
             "mask", torch.triu(torch.ones(context_length, context_length), diagonal=1)
@@ -75,7 +75,7 @@ class MultiHeadAttentionWrapper(nn.Module):
 
 class MultiHeadAttention(SelfAttention_v2):
     def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
-        super().__init__(d_in, d_out, qkv_bias=False)
+        super().__init__(d_in, d_out, qkv_bias)
         assert d_out % num_heads == 0, "d_out must be divisible by num_heads"
 
         self.d_out = d_out
