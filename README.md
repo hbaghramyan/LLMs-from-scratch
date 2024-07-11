@@ -1,6 +1,6 @@
 # Build a Large Language Model (From Scratch)
 
-This repository contains the code for coding, pretraining, and finetuning a GPT-like LLM and is the official code repository for the book [Build a Large Language Model (From Scratch)](http://mng.bz/orYv).
+This repository contains the code for developing, pretraining, and finetuning a GPT-like LLM and is the official code repository for the book [Build a Large Language Model (From Scratch)](http://mng.bz/orYv).
 
 (If you downloaded the code bundle from the Manning website, please consider visiting the official code repository on GitHub at [https://github.com/rasbt/LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch).)
 
@@ -13,7 +13,7 @@ This repository contains the code for coding, pretraining, and finetuning a GPT-
 
 In [*Build a Large Language Model (From Scratch)*](http://mng.bz/orYv), you'll learn and understand how large language models (LLMs) work from the inside out by coding them from the ground up, step by step. In this book, I'll guide you through creating your own LLM, explaining each stage with clear text, diagrams, and examples.
 
-The method described in this book for training and developing your own small-but-functional model for educational purposes mirrors the approach used in creating large-scale foundational models such as those behind ChatGPT.
+The method described in this book for training and developing your own small-but-functional model for educational purposes mirrors the approach used in creating large-scale foundational models such as those behind ChatGPT. In addition, this book includes code for loading the weights of larger pretrained models for finetuning.
 
 - Link to the official [source code repository](https://github.com/rasbt/LLMs-from-scratch)
 - [Link to the book at Manning](http://mng.bz/orYv)
@@ -67,7 +67,7 @@ Alternatively, you can view this and other files on GitHub at [https://github.co
 <br>
 &nbsp
 
-Shown below is a mental model summarizing the contents covered in this book.
+The mental model below summarizes the contents covered in this book.
 
 <img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/mental-model.jpg" width="650px">
 
@@ -115,7 +115,7 @@ Several folders contain optional materials as a bonus for interested readers:
 
 ### Citation
 
-If you find this book  or code useful for your research, please consider citing it:
+If you find this book or code useful for your research, please consider citing it:
 
 ```
 @book{build-llms-from-scratch-book,
