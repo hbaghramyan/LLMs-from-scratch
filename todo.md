@@ -257,3 +257,7 @@ to discuss
 to discuss
 
 * attn_scores.masked_fill_(self.mask.bool()[:num_tokens, :num_tokens], -torch.inf)
+
+**Causal attention** is crucial for autoregressive tasks, where the model generates text one token at a time, predicting the next token based on the previous ones. This is essential for maintaining the chronological order of text generation, ensuring that the model doesn’t use future information that hasn’t been generated yet.
+
+**Conventional attention** is useful for tasks like text classification, where understanding the entire context (both past and future tokens) is important. Models like BERT (Bidirectional Encoder Representations from Transformers) use this type of attention.
