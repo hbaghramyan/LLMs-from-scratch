@@ -265,3 +265,14 @@ to discuss
 .view() can be applied only to contiguous Tensors 
 
 .transpose() usually results in non-contiguous tensors
+
+ ### 29/07/2024 -
+
+ 1. mha-implementations.ipynb from the 02_bonus_efficient-multihead-attention
+ սա ուղղակի նայի, առանց շատ խորանալու, պետք ա աշխատեցնես google colab-ում
+
+ 2. օնլայն գրքից - 4.1, 4.2 
+
+ 3. Հավանականության գրքից - 1.6 խնդիրներով հանդերձ
+
+ 4. from the Course - Unit 4 Exercises
