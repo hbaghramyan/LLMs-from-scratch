@@ -275,4 +275,33 @@ to discuss
 
  3. Հավանականության գրքից - 1.6 խնդիրներով հանդերձ
 
- 4. from the Course - Unit 4 Exercises
+ 4. from the Course - Unit 3 Exercises
+
+ to discuss
+
+    1. 
+
+    self.trf_blocks = nn.Sequential(
+    *[DummyTransformerBlock(cfg) for _ in range(cfg["n_layers"])])
+    
+    self.trf_blocks = nn.Sequential(
+    DummyTransformerBlock(cfg),
+    DummyTransformerBlock(cfg),
+    DummyTransformerBlock(cfg),
+    ...
+)
+
+    2. the need for to_device()
+
+    To ensure that the positional embeddings are on the same device as the input indices and token embeddings, you specify device=in_idx.device when creating the positional indices tensor. This guarantees that the positional indices tensor and, consequently, the output of pos_emb will be on the correct device.
+
+ ### 05/08/2024 -
+
+ 1. mha-implementations.ipynb from the 02_bonus_efficient-multihead-attention
+ սա ուղղակի նայի, առանց շատ խորանալու, պետք ա աշխատեցնես google colab-ում
+
+ 2. օնլայն գրքից - 4.1, 4.2, 4.3, 4.4
+
+ 3. Հավանականության գրքից - 1.7 առանց խնդիրների
+
+ 4. from the Course - Unit 3 Exercises + Units 4.1, 4.2, 4.3
