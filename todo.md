@@ -295,6 +295,15 @@ to discuss
 
     To ensure that the positional embeddings are on the same device as the input indices and token embeddings, you specify device=in_idx.device when creating the positional indices tensor. This guarantees that the positional indices tensor and, consequently, the output of pos_emb will be on the correct device.
 
+    3. 
+
+    https://en.wikipedia.org/wiki/Rectifier_(neural_networks)
+
+    4. 
+
+    https://en.wikipedia.org/wiki/Bessel%27s_correction
+
+
  ### 05/08/2024 -
 
  1. mha-implementations.ipynb from the 02_bonus_efficient-multihead-attention
