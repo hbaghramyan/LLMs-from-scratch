@@ -314,3 +314,13 @@ to discuss
  3. Հավանականության գրքից - 1.7 առանց խնդիրների
 
  4. from the Course - Unit 3 Exercises + Units 4.1, 4.2, 4.3
+
+  ### 12/08/2024 -
+
+  1. օնլայն գրքից - 4.3, 4.4, 4.5
+
+  2. հավանականության գրքից - 1.7 խնդիրներ
+
+  3. from the Course - Unit 3 Exercises + Units 4.1, 4.2
+
+  4. tokenization study - only for me Henrikh
