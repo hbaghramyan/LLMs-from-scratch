@@ -40,7 +40,7 @@ git clone --depth 1 https://github.com/rasbt/LLMs-from-scratch.git
 
 Please note that this `README.md` file is a Markdown (`.md`) file. If you have downloaded this code bundle from the Manning website and are viewing it on your local computer, I recommend using a Markdown editor or previewer for proper viewing. If you haven't installed a Markdown editor yet, [MarkText](https://www.marktext.cc) is a good free option.
 
-Alternatively, you can view this and other files on GitHub at [https://github.com/rasbt/LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch).
+You can alternatively view this and other files on GitHub at [https://github.com/rasbt/LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch) in your browser, which renders Markdown automatically.
 
 <br>
 <br>
@@ -139,7 +139,13 @@ However, since this repository contains the code corresponding to a print book, 
 &nbsp;
 ## Citation
 
-If you find this book or code useful for your research, please consider citing it:
+If you find this book or code useful for your research, please consider citing it.
+
+Chicago-style citation:
+
+> Raschka, Sebastian. *Build A Large Language Model (From Scratch)*. Manning, 2024. ISBN: 978-1633437166.
+
+BibTeX entry:
 
 ```
 @book{build-llms-from-scratch-book,
