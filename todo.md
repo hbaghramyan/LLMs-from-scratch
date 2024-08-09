@@ -324,3 +324,29 @@ to discuss
   3. from the Course - Unit 3 Exercises + Units 4.1, 4.2
 
   4. tokenization study - only for me Henrikh
+
+  To discuss
+
+  Layer Normalization in LLMs:
+
+	•	Normalization Process:
+	•	Layer Norm normalizes across the feature dimension for each token independently.
+	•	For each token, it computes the mean and variance across all 768 features (not across the batch).
+	•	This means for each token, it normalizes the 768 features using the mean and variance computed across these features.
+	•	Intuitive Example:
+	•	Imagine you are processing the word “cat” in the sentence. The word “cat” is represented by a vector of 768 features. Layer Norm will normalize this vector by computing the mean and variance across these 768 features and then normalizing and scaling them.
+	•	Each token has its own normalization, independent of other tokens or other examples in the batch.
+
+Batch Normalization in CNNs:
+
+	•	Normalization Process:
+	•	For each filter (out of the 16 filters), Batch Norm normalizes the activations across the batch dimension.
+	•	This means for each filter, it looks at all the activations across the batch and computes the mean and variance for each spatial location (i.e., each pixel position in the 32 \times 32  grid).
+	•	The normalization is performed across all images in the batch for each filter separately.
+	•	Intuitive Example:
+	•	Imagine you have 32 images (batch size  N = 32 ). For each filter in the CNN, you would compute the mean and variance across these 32 images for each pixel location in the  32 \times 32  feature map.
+	•	After normalization, the pixel values are scaled and shifted using the learned gamma and beta parameters, but each filter has its own pair of these parameters.
+
+https://de.wikipedia.org/wiki/Convolutional_Neural_Network
+
+https://youtu.be/DtEq44FTPM4?si=wIl8-RlKH13qqaGJ&t=382
