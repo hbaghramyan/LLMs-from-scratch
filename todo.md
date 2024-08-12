@@ -350,3 +350,11 @@ Batch Normalization in CNNs:
 https://de.wikipedia.org/wiki/Convolutional_Neural_Network
 
 https://youtu.be/DtEq44FTPM4?si=wIl8-RlKH13qqaGJ&t=382
+
+### 28/08/2024 -
+
+1. օնլայն գրքից - 4.3, 4.4, 4.5, 4.6, 4.7
+
+2. from the Course - Unit 3 Exercises + Units 4.1, 4.2 - 4.6
+
+3. Հավանականության գրքից, 1.8
