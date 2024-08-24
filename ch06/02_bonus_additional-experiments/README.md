@@ -18,7 +18,7 @@ For example,
 | 5    | gpt2-small (124M)  | pretrained | last                     | all              | longest train ex. (120)                                | 99.62%       | 96.64%         | 96.67%   | 0.69 min      | A100    |
 | 6    | gpt2-medium (355M) | pretrained | last                     | last_block       | longest train ex. (120)                                | 87.50%       | 91.28%         | 84.67%   | 0.75 min      | A100    |
 | 7    | gpt2-large (774M)  | pretrained | last                     | last_block       | longest train ex. (120)                                | 99.52%       | 98.66%         | 96.67%   | 1.50 min      | A100    |
-| 8    | gpt2-xl (1558M)    | pretrained | last                     | last_block       | longest train ex. (120)                                | 99.81%       | 99.33%         | 98.33%   | 2.83 min      | A100    |
+| 8    | gpt2-xl (1558M)    | pretrained | last                     | last_block       | longest train ex. (120)                                | 99.81%       | 99.81%         | 98.33%   | 2.83 min      | A100    |
 | 9    | gpt2-xl (1558M)    | pretrained | last                     | all              | longest train ex. (120)                                | 100.00%      | 98.66%         | 98.67%   | 8.12 min      | A100    |
 | 10   | gpt2-small (124M)  | random     | last                     | all              | longest train ex. (120)                                | 100.00%      | 96.64%         | 93.67%   | 0.69 min      | A100    |
 | 11   | gpt2-small (124M)  | pretrained | last                     | LoRA             | longest train ex. (120)                                | 100.00%      | 97.32%         | 96.67%   | 0.75 min      | A100    |
@@ -35,23 +35,23 @@ For example,
 
 You can use the following code to reproduce the experiments:
 
-- Row 1: `python additional-experiments.py`
-- Row 2: `python additional-experiments.py --trainable_token_pos first`
-- Row 3: `python additional-experiments.py --trainable_layers last_layer`
-- Row 4: `python additional-experiments.py --trainable_layers last_two_blocks`
-- Row 5: `python additional-experiments.py --trainable_layers all`
-- Row 6: `python additional-experiments.py --model_size "gpt2-medium (355M)"`
-- Row 7: `python additional-experiments.py --model_size "gpt2-large (774M)"`
-- Row 8: `python additional-experiments.py --model_size "gpt2-xl (1558M)"`
-- Row 9: `python additional-experiments.py --model_size "gpt2-xl (1558M)"--trainable_layers all`
-- Row 10: `python additional-experiments.py --weights random --trainable_layers all`
-- Row 11: `python additional-experiments.py --trainable_layers lora --lora_rank 16 --lora_alpha 16`
-- Row 12: `python additional-experiments.py --trainable_layers lora --lora_rank 16 --lora_alpha 8 --model_size "gpt2-xl (1558M)"`
-- Row 13: `python additional-experiments.py --context_length "model_context_length"`
-- Row 14: `python additional-experiments.py --no_padding --batch_size 1`
-- Row 15: `python additional-experiments.py --no_padding --batch_size 1 --accumulation_steps 8`
-- Row 16: `python additional-experiments.py --disable_causal_mask`
-- Row 17: `python additional-experiments.py --ignore_index 50256`
+- Row 1: `python additional_experiments.py`
+- Row 2: `python additional_experiments.py --trainable_token_pos first`
+- Row 3: `python additional_experiments.py --trainable_layers last_layer`
+- Row 4: `python additional_experiments.py --trainable_layers last_two_blocks`
+- Row 5: `python additional_experiments.py --trainable_layers all`
+- Row 6: `python additional_experiments.py --model_size "gpt2-medium (355M)"`
+- Row 7: `python additional_experiments.py --model_size "gpt2-large (774M)"`
+- Row 8: `python additional_experiments.py --model_size "gpt2-xl (1558M)"`
+- Row 9: `python additional_experiments.py --model_size "gpt2-xl (1558M)"--trainable_layers all`
+- Row 10: `python additional_experiments.py --weights random --trainable_layers all`
+- Row 11: `python additional_experiments.py --trainable_layers lora --lora_rank 16 --lora_alpha 16`
+- Row 12: `python additional_experiments.py --trainable_layers lora --lora_rank 16 --lora_alpha 8 --model_size "gpt2-xl (1558M)"`
+- Row 13: `python additional_experiments.py --context_length "model_context_length"`
+- Row 14: `python additional_experiments.py --no_padding --batch_size 1`
+- Row 15: `python additional_experiments.py --no_padding --batch_size 1 --accumulation_steps 8`
+- Row 16: `python additional_experiments.py --disable_causal_mask`
+- Row 17: `python additional_experiments.py --ignore_index 50256`
 
 I've kept the LLM and dataset small on purpose, so you can run the training on a regular laptop like a MacBook Air M3 in about 15 minutes (for the default setting) in case you don't have access to a GPU.
 
