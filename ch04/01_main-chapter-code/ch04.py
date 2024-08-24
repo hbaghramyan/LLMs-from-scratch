@@ -158,7 +158,7 @@ sample_input = torch.tensor([[1.0, 0.0, -1.0]])
 torch.manual_seed(
     123
 )  # specify random seed for the initial weights for reporducibility
-model_without_shortcut = ExampleDeepNeuralNetwork(layer_sizes, use_shortcut=False)
+model_without_shortcut = ExampleDeepNeuralNetwork(layer_sizes, use_shortcut=True)
 print_gradients(model_without_shortcut, sample_input)
 
 ffn = FeedForward(GPT_CONFIG_124M)
