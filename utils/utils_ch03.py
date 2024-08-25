@@ -78,6 +78,7 @@ class MultiHeadAttention(SelfAttention_v2):
         super().__init__(d_in, d_out, qkv_bias)
         assert d_out % num_heads == 0, "d_out must be divisible by num_heads"
 
+        self.d_in = d_in
         self.d_out = d_out
         self.num_heads = num_heads
         self.head_dim = (
