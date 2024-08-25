@@ -2,7 +2,12 @@ import torch
 import torch.nn as nn
 import tiktoken
 import matplotlib.pyplot as plt
+import os
+import sys
 
+sys.path.insert(0, os.getcwd())
+
+from utils.utils_ch03 import MultiHeadAttention
 
 GPT_CONFIG_124M = {
     "vocab_size": 50257,  # Vocabulary size
@@ -132,6 +137,47 @@ class ExampleDeepNeuralNetwork(nn.Module):
             else:
                 x = layer_output
         return x
+
+
+class TransformerBlock(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.att = MultiHeadAttention(
+            d_in=cfg["emb_dim"],
+            d_out=cfg["emb_dim"],
+            context_length=cfg["context_length"],
+            num_heads=cfg["n_heads"],
+            dropout=cfg["drop_rate"],
+            qkv_bias=cfg["qkv_bias"],
+        )
+        self.ff = FeedForward(cfg)
+        self.norm1 = LayerNorm(emb_dim=cfg["emb_dim"])
+        self.norm2 = LayerNorm(emb_dim=cfg["emb_dim"])
+        self.drop_shortcut = nn.Dropout(p=cfg["drop_rate"])
+
+    def forward(self, x):
+        # Shortcut connection for attention block
+        shortcut = x
+
+        x = self.norm1(x)
+        x = self.att(x)  # Shape [batch_size, num_tokens, emb_size]
+        x = self.drop_shortcut(x)
+        x = shortcut + x  # Add the original input back
+
+        shortcut = x
+        x = self.norm2(x)
+        x = self.ff(x)
+        x = self.drop_shortcut(x)
+        x = shortcut + x  # Add the original input back
+        return x
+
+
+torch.manual_seed(123)
+x = torch.rand(2, 4, 768)
+block = TransformerBlock(GPT_CONFIG_124M)
+output = block(x)
+
+print("Here")
 
 
 def print_gradients(model, x):
