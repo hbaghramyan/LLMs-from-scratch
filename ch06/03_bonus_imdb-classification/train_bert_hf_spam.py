@@ -280,15 +280,15 @@ if __name__ == "__main__":
         type=str,
         default="true",
         help=(
-            "Whether to use a attention mask for padding tokens. Options: 'true', 'false'"
+            "Whether to use a attention mask for padding tokens. Options: 'true', 'false'."
         )
     )
     parser.add_argument(
-        "--bert_model",
+        "--model",
         type=str,
         default="distilbert",
         help=(
-            "Which model to train. Options: 'distilbert', 'bert'."
+            "Which model to train. Options: 'distilbert', 'bert', 'roberta'."
         )
     )
     parser.add_argument(
@@ -299,6 +299,14 @@ if __name__ == "__main__":
             "Number of epochs."
         )
     )
+    parser.add_argument(
+        "--learning_rate",
+        type=float,
+        default=5e-6,
+        help=(
+            "Learning rate."
+        )
+    )
     args = parser.parse_args()
 
     ###############################
@@ -306,15 +314,17 @@ if __name__ == "__main__":
     ###############################
 
     torch.manual_seed(123)
-    if args.bert_model == "distilbert":
+    if args.model == "distilbert":
 
         model = AutoModelForSequenceClassification.from_pretrained(
             "distilbert-base-uncased", num_labels=2
         )
         model.out_head = torch.nn.Linear(in_features=768, out_features=2)
-
+        for param in model.parameters():
+            param.requires_grad = False
         if args.trainable_layers == "last_layer":
-            pass
+            for param in model.out_head.parameters():
+                param.requires_grad = True
         elif args.trainable_layers == "last_block":
             for param in model.pre_classifier.parameters():
                 param.requires_grad = True
@@ -328,15 +338,17 @@ if __name__ == "__main__":
 
         tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
-    elif args.bert_model == "bert":
+    elif args.model == "bert":
 
         model = AutoModelForSequenceClassification.from_pretrained(
             "bert-base-uncased", num_labels=2
         )
         model.classifier = torch.nn.Linear(in_features=768, out_features=2)
-
+        for param in model.parameters():
+            param.requires_grad = False
         if args.trainable_layers == "last_layer":
-            pass
+            for param in model.classifier.parameters():
+                param.requires_grad = True
         elif args.trainable_layers == "last_block":
             for param in model.classifier.parameters():
                 param.requires_grad = True
@@ -351,9 +363,31 @@ if __name__ == "__main__":
             raise ValueError("Invalid --trainable_layers argument.")
 
         tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    elif args.model == "roberta":
 
+        model = AutoModelForSequenceClassification.from_pretrained(
+            "FacebookAI/roberta-large", num_labels=2
+        )
+        model.classifier.out_proj = torch.nn.Linear(in_features=1024, out_features=2)
+        for param in model.parameters():
+            param.requires_grad = False
+        if args.trainable_layers == "last_layer":
+            for param in model.classifier.parameters():
+                param.requires_grad = True
+        elif args.trainable_layers == "last_block":
+            for param in model.classifier.parameters():
+                param.requires_grad = True
+            for param in model.roberta.encoder.layer[-1].parameters():
+                param.requires_grad = True
+        elif args.trainable_layers == "all":
+            for param in model.parameters():
+                param.requires_grad = True
+        else:
+            raise ValueError("Invalid --trainable_layers argument.")
+
+        tokenizer = AutoTokenizer.from_pretrained("FacebookAI/roberta-large")
     else:
-        raise ValueError("Selected --bert_model not supported.")
+        raise ValueError("Selected --model {args.model} not supported.")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -436,7 +470,7 @@ if __name__ == "__main__":
 
     start_time = time.time()
     torch.manual_seed(123)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5, weight_decay=0.1)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=args.learning_rate, weight_decay=0.1)
 
     train_losses, val_losses, train_accs, val_accs, examples_seen = train_classifier_simple(
         model, train_loader, val_loader, optimizer, device,
