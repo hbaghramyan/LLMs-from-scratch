@@ -172,6 +172,24 @@ class TransformerBlock(nn.Module):
         return x
 
 
+class GPTModel(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.tok_emb = nn.Embedding(cfg["vocab_size"], cfg["emb_dim"])
+        self.pos_emb = nn.Embedding(cfg["config_length"], cfg["emb_dim"])
+        self.drop_emd = nn.Dropout(p=cfg["drop_rate"])
+
+        self.trf_blocks = nn.Sequential(
+            *[TransformerBlock[cfg] for _ in range(cfg["n_layers"])]
+        )
+
+        self.final_norm = LayerNorm(cfg["emb_dim"])
+        self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False)
+
+    # def forward(self, in_idx):
+    #     bact
+
+
 torch.manual_seed(123)
 x = torch.rand(2, 4, 768)
 block = TransformerBlock(GPT_CONFIG_124M)
