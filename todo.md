@@ -358,3 +358,28 @@ https://youtu.be/DtEq44FTPM4?si=wIl8-RlKH13qqaGJ&t=382
 2. from the Course - Unit 3 Exercises + Units 4.1, 4.2 - 4.6
 
 3. Հավանականության գրքից, 1.8
+
+### 02/09/2024 -
+
+1. օնլայն գրքից - 4.6, 4.7 - նույնն եմ թողնում էս անգամ
+
+2. from the Course - Unit 3 Exercises + Units 4.4, 4.5, 4.6 - նույնն եմ թողնում էս անգամ
+
+3. Հավանականության գրքից, 1.8 - միայն կարդալ
+
+4. https://www.youtube.com/watch?v=CS4cs9xVecg&list=PLkDaE6sCZn6Ec-XTbcX1uRg2_u4xOEky0
+
+առաջին շաբաթվա նյութրը նայի - բոլորը, որոնք C1W1 ունեն իրենց անվանման մեջ,
+ավելի ուշ կավելացնեմ կոդերի նյութերը
+
+5. 
+
+https://youtu.be/4u81xU7BIOc?si=GtSSKSsCtFr1O74d&t=3980
+
+սա եթե կհասցնես նայի էն վարկյանից, որը նշել եմ
+
+https://youtu.be/4u81xU7BIOc?si=Ufs_O74n7Imh5kYT&t=948
+
+ու սա մինչև 30։27
+
+6. https://huggingface.co/learn/nlp-course/en/chapter6/2?fw=pt 
