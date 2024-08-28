@@ -363,14 +363,14 @@ https://youtu.be/DtEq44FTPM4?si=wIl8-RlKH13qqaGJ&t=382
 
 1. օնլայն գրքից - 4.6, 4.7 - նույնն եմ թողնում էս անգամ
 
-2. from the Course - Unit 3 Exercises + Units 4.4, 4.5, 4.6 - նույնն եմ թողնում էս անգամ
+2. from the Course - Unit 3 Exercises + Units 4.4, 4.5, 4.6 - նույնն եմ թողնում էս 
 
 3. Հավանականության գրքից, 1.8 - միայն կարդալ
 
 4. https://www.youtube.com/watch?v=CS4cs9xVecg&list=PLkDaE6sCZn6Ec-XTbcX1uRg2_u4xOEky0
 
 առաջին շաբաթվա նյութրը նայի - բոլորը, որոնք C1W1 ունեն իրենց անվանման մեջ,
-ավելի ուշ կավելացնեմ կոդերի նյութերը
+ավելի ուշ կավելացնեմ կոդերի նյութերը, նաև C1_W1.pdf կարդա
 
 5. 
 
