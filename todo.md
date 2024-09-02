@@ -383,3 +383,23 @@ https://youtu.be/4u81xU7BIOc?si=Ufs_O74n7Imh5kYT&t=948
 ու սա մինչև 30։27
 
 6. https://huggingface.co/learn/nlp-course/en/chapter6/2?fw=pt 
+
+To discuss
+
+1. sys.path.insert(0, os.getcwd())
+
+2. sum(p.numel() for p in block.att.parameters())
+2360064
+[p.numel() for p in block.att.parameters()]
+[589824, 589824, 589824, 589824, 768]
+sum([p.numel() for p in block.att.parameters()])
+2360064
+
+### 09/09/2024 -
+
+օնլայն գրքից - 4.6 - exercises, 
+4.7 - նույնն եմ թողնում էս անգամ
+
+stratification
+
+Arturo neural nets resource concept 
