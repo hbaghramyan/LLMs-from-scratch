@@ -386,7 +386,7 @@ https://youtu.be/4u81xU7BIOc?si=Ufs_O74n7Imh5kYT&t=948
 
 To discuss
 
-1. sys.path.insert(0, os.getcwd())
+
 
 2. sum(p.numel() for p in block.att.parameters())
 2360064
@@ -395,11 +395,25 @@ To discuss
 sum([p.numel() for p in block.att.parameters()])
 2360064
 
-### 09/09/2024 -
+### 16/09/2024 -
 
-օնլայն գրքից - 4.6 - exercises, 
-4.7 - նույնն եմ թողնում էս անգամ
+1. օնլայն գրքից - 4.6 - exercises, ch04/02_performance-analysis/flops-analysis.ipynb, 4.7
 
-stratification
+2. [stratificatied vs cluster vs random vs convinient vs systematic sampling](https://www.youtube.com/watch?v=9PaR1TsvnJs) 
 
-Arturo neural nets resource concept 
+3. To understand how you can approximate a function using neural nets 
+    https://stackoverflow.com/questions/55170460/neural-network-for-square-x2-approximation#:~:text=15-,The%20problem,-is%20that%20x
+
+4. [GPU vs CPU](https://stackoverflow.com/questions/53325418/pytorch-speed-comparison-gpu-slower-than-cpu#:~:text=39-,GPU,-acceleration%20works%20by) կարող ես փորձարկել Colab-ում
+
+5. http://neuralnetworksanddeeplearning.com/chap1.html մինչև Sigmoid neurons
+
+6. Հավանականության գրքից, 1.8 - առաջադրանքները
+
+7. https://www.youtube.com/watch?v=CS4cs9xVecg&list=PLkDaE6sCZn6Ec-XTbcX1uRg2_u4xOEky0 - միայն W02 վիդեոները նայել
+
+8. sys.path.insert(0, os.getcwd())
+
+9. https://huggingface.co/learn/nlp-course/en/chapter6/2?fw=pt 
+
+10. էն հայերեն տեքստերից մեկը փորձի բաց անել ու տեքտը որպես txt պահել
