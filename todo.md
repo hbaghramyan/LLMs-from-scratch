@@ -397,6 +397,8 @@ sum([p.numel() for p in block.att.parameters()])
 
 ### 16/09/2024 -
 
+0. see the todo.md in dl fundamentals
+
 1. օնլայն գրքից - 4.6 - exercises, ch04/02_performance-analysis/flops-analysis.ipynb, 4.7
 
 2. [stratificatied vs cluster vs random vs convinient vs systematic sampling](https://www.youtube.com/watch?v=9PaR1TsvnJs) 

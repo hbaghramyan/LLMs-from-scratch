@@ -17,6 +17,40 @@ GPT_CONFIG_124M = {
     "n_layers": 12,  # Number of layers
     "drop_rate": 0.1,  # Dropout rate
     "qkv_bias": False,  # Query-Key-Value bias
+    "model_name": "gpt_small",
+}
+
+GPT_MEDIUM = {
+    "vocab_size": 50257,  # Vocabulary size
+    "context_length": 1024,  # Context length
+    "emb_dim": 1024,  # Embedding dimension
+    "n_heads": 16,  # Number of attention heads
+    "n_layers": 24,  # Number of layers
+    "drop_rate": 0.1,  # Dropout rate
+    "qkv_bias": False,  # Query-Key-Value bias
+    "model_name": "gpt_medium",
+}
+
+GPT_LARGE = {
+    "vocab_size": 50257,  # Vocabulary size
+    "context_length": 1024,  # Context length
+    "emb_dim": 1280,  # Embedding dimension
+    "n_heads": 20,  # Number of attention heads
+    "n_layers": 36,  # Number of layers
+    "drop_rate": 0.1,  # Dropout rate
+    "qkv_bias": False,  # Query-Key-Value bias
+    "model_name": "gpt_large",
+}
+
+GPT_XL = {
+    "vocab_size": 50257,  # Vocabulary size
+    "context_length": 1024,  # Context length
+    "emb_dim": 1600,  # Embedding dimension
+    "n_heads": 25,  # Number of attention heads
+    "n_layers": 48,  # Number of layers
+    "drop_rate": 0.1,  # Dropout rate
+    "qkv_bias": False,  # Query-Key-Value bias
+    "model_name": "gpt_xl",
 }
 
 
@@ -264,7 +298,7 @@ out = generate_text_simple(
 )
 
 print("Output:", out)
-print("Output length:", len[out[0]])
+print("Output length:", len(out[0]))
 # exercise 01 solution
 
 num_att = 0
@@ -276,6 +310,14 @@ for block in model.trf_blocks:
 
 # end of exercise 01 solution
 
+# exercise 02 solution begin
+for config in [GPT_MEDIUM, GPT_LARGE, GPT_XL]:
+    model = GPTModel(config)
+    total = sum(p.numel() for p in model.parameters())
+    print(f"Number of parameters in {config['model_name']} is", total)
+    total_size = total * 4 / (1024 * 1024)
+    print(f"Size of moodel {config['model_name']} in MBs is {total_size:.2f}")
+# exercise 02 solution end
 print(f"Total elements in attention layers is: {num_att}")
 print(f"Total elements in attention layers is: {num_ff}")
 
