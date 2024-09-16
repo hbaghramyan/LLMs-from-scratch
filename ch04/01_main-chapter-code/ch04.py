@@ -239,13 +239,24 @@ class GPTModel(nn.Module):
         return logits
 
 
-def generate_text_simple(model, idx, max_new_tokens, context_size):
+def generate_text_simple(
+    model: "GPTModel", idx: torch.Tensor, max_new_tokens: int, context_size: int
+) -> torch.Tensor:
     # idx is (batch, n_tokens) array of indices in the current context
-    for _ in range(max_new_tokens):
+    """Text generator function
+    Args:
+        model (GPTModel): the model used for the inference
+        idx (torch.Tensor): tokenized input
+        max_new_tokens (int): maximum number of tokens to generate
+        context_size (int): the maximum number of tokens the model can consider as input
+    Returns:
+        idx (torch.Tensor): tokenized input + output
+    """
 
+    for _ in range(max_new_tokens):
         # Crop current context if it exceeds the supported context size
         # E.g., if LLM supports only 5 tokens, and the context size is 10
-        # then only the last 5 tokens are used as context
+        # the only the last 5 tokens are used as context
         idx_cond = idx[:, -context_size:]
 
         # Get the predictions
@@ -256,8 +267,8 @@ def generate_text_simple(model, idx, max_new_tokens, context_size):
         # (batch, n_tokens, vocab_size) becomes (batch, vocab_size)
         logits = logits[:, -1, :]
 
-        # Apply softmax to get probabilities
-        probas = torch.softmax(logits, dim=-1)  # (batch, vocab_size)
+        # Apply softmaxt to get probabilities
+        probas = torch.softmax(logits, dim=-1)
 
         # Get the idx of the vocab entry with the highest probability value
         idx_next = torch.argmax(probas, dim=-1, keepdim=True)  # (batch, 1)
@@ -299,6 +310,10 @@ out = generate_text_simple(
 
 print("Output:", out)
 print("Output length:", len(out[0]))
+
+decoded_text = tokenizer.decode(out.squeeze(dim=0).tolist())
+print(decoded_text)
+
 # exercise 01 solution
 
 num_att = 0
