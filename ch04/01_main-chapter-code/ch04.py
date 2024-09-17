@@ -7,7 +7,7 @@ import sys
 
 sys.path.insert(0, os.getcwd())
 
-from utils.utils_ch03 import MultiHeadAttention
+from utils.utils_prev import MultiHeadAttention
 
 GPT_CONFIG_124M = {
     "vocab_size": 50257,  # Vocabulary size
@@ -15,7 +15,9 @@ GPT_CONFIG_124M = {
     "emb_dim": 768,  # Embedding dimension
     "n_heads": 12,  # Number of attention heads
     "n_layers": 12,  # Number of layers
-    "drop_rate": 0.1,  # Dropout rate
+    "drop_rate_gpt": 0.1,  # Dropout rate gpt
+    "drop_rate_shc": 0.2,  # Dropout rate shortcut
+    "drop_rate_mha": 0.15,  # Dropout rate multi-head-attention
     "qkv_bias": False,  # Query-Key-Value bias
     "model_name": "gpt_small",
 }
@@ -59,7 +61,7 @@ class DummyGPTModel(nn.Module):
         super().__init__()
         self.tok_emb = nn.Embedding(cfg["vocab_size"], cfg["emb_dim"])
         self.pos_emb = nn.Embedding(cfg["context_length"], cfg["emb_dim"])
-        self.drop_emb = nn.Dropout(cfg["drop_rate"])
+        self.drop_emb = nn.Dropout(cfg["drop_rate_gpt"])
 
         # Use a placeholder for TransformerBlock
         self.trf_blocks = nn.Sequential(
@@ -186,13 +188,13 @@ class TransformerBlock(nn.Module):
             d_out=cfg["emb_dim"],
             context_length=cfg["context_length"],
             num_heads=cfg["n_heads"],
-            dropout=cfg["drop_rate"],
+            dropout=cfg["drop_rate_mha"],
             qkv_bias=cfg["qkv_bias"],
         )
         self.ff = FeedForward(cfg)
         self.norm1 = LayerNorm(emb_dim=cfg["emb_dim"])
         self.norm2 = LayerNorm(emb_dim=cfg["emb_dim"])
-        self.drop_shortcut = nn.Dropout(p=cfg["drop_rate"])
+        self.drop_shortcut = nn.Dropout(p=cfg["drop_rate_shc"])
 
     def forward(self, x):
         # Shortcut connection for attention block
@@ -216,7 +218,7 @@ class GPTModel(nn.Module):
         super().__init__()
         self.tok_emb = nn.Embedding(cfg["vocab_size"], cfg["emb_dim"])
         self.pos_emb = nn.Embedding(cfg["context_length"], cfg["emb_dim"])
-        self.drop_emd = nn.Dropout(p=cfg["drop_rate"])
+        self.drop_emd = nn.Dropout(p=cfg["drop_rate_gpt"])
 
         self.trf_blocks = nn.Sequential(
             *[TransformerBlock(cfg) for _ in range(cfg["n_layers"])]
@@ -326,12 +328,12 @@ for block in model.trf_blocks:
 # end of exercise 01 solution
 
 # exercise 02 solution begin
-for config in [GPT_MEDIUM, GPT_LARGE, GPT_XL]:
-    model = GPTModel(config)
-    total = sum(p.numel() for p in model.parameters())
-    print(f"Number of parameters in {config['model_name']} is", total)
-    total_size = total * 4 / (1024 * 1024)
-    print(f"Size of moodel {config['model_name']} in MBs is {total_size:.2f}")
+# for config in [GPT_MEDIUM, GPT_LARGE, GPT_XL]:
+#     model = GPTModel(config)
+#     total = sum(p.numel() for p in model.parameters())
+#     print(f"Number of parameters in {config['model_name']} is", total)
+#     total_size = total * 4 / (1024 * 1024)
+#     print(f"Size of moodel {config['model_name']} in MBs is {total_size:.2f}")
 # exercise 02 solution end
 print(f"Total elements in attention layers is: {num_att}")
 print(f"Total elements in attention layers is: {num_ff}")
