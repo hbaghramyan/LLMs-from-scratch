@@ -1,6 +1,7 @@
 import torch
 from thop import profile
 import os
+import psutil
 import sys
 
 sys.path.insert(0, os.getcwd())
@@ -21,6 +22,15 @@ model_configs = {
     "gpt-xl (1558M)": {"emb_dim": 1600, "n_layers": 48, "n_heads": 25},
 }
 
+
+def print_memory_usage():
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    print(f"RSS Memory: {mem_info.rss / 1024**2:.2f} MB")
+    print(f"VMS Memory: {mem_info.vms / 1024**2:.2f} MB")
+    print("-" * 30)
+
+
 device = torch.device(
     "mps"
     if torch.backends.mps.is_available()
@@ -31,10 +41,21 @@ input_tensor = torch.randint(0, 50257, (2, 1024)).to(device)
 for size in model_configs:
     BASE_CONFIG.update(model_configs[size])
 
-    model = GPTModel(BASE_CONFIG)
+    print("Profiling memory usage", size)
 
-    model = GPTModel(BASE_CONFIG).bfloat16()
+    model = GPTModel(BASE_CONFIG)
     model.to(device)
 
+    print_memory_usage()
     # MACS = multiply-accumulate operations
     # MACS are typically counted as two FLOPS (one multiply and one accumulate)
+    macs, _ = profile(model=model, inputs=(input_tensor,), verbose=False)
+    flops = 2 * macs
+
+    del model
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
+    elif device.type == "mps":
+        torch.mps.empty_cache()
+
+    print_memory_usage()

@@ -519,3 +519,9 @@ https://drive.google.com/drive/folders/1BYE-XGL0csgQfaRbImZhDMcY9uXWV2vS
 էստեղ են, քեզ հետ կիսվել էի
 
 7. https://huggingface.co/learn/nlp-course/en/chapter6/2?fw=pt 
+
+### To discuss
+
+1. BASE_CONFIG.update(model_configs[size]) 
+In this config 'emb_dim': 1024, 'n_layers': 24, 'n_heads': 16 get updated every time the loop
+runs because there can't be 2 keys with the same name in the dictionaries.
