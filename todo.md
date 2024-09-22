@@ -525,3 +525,14 @@ https://drive.google.com/drive/folders/1BYE-XGL0csgQfaRbImZhDMcY9uXWV2vS
 1. BASE_CONFIG.update(model_configs[size]) 
 In this config 'emb_dim': 1024, 'n_layers': 24, 'n_heads': 16 get updated every time the loop
 runs because there can't be 2 keys with the same name in the dictionaries.
+
+2. add notebooks from the previous chapters to discuss
+
+3. lightning course unit 4 exercises
+
+4. id(idx_cond)
+5808296944
+id(idx)
+5797275792
+idx_cond is idx
+False
