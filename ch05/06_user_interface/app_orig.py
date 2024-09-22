@@ -16,10 +16,12 @@ from previous_chapters import (
     token_ids_to_text,
 )
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def get_model_and_tokenizer():
     """
-    Code to loads a GPT-2 model with pretrained weights from OpenAI.
+    Code to load a GPT-2 model with pretrained weights from OpenAI.
     The code is similar to chapter 5.
     The model will be downloaded automatically if it doesn't exist in the current folder, yet.
     """
@@ -44,8 +46,6 @@ def get_model_and_tokenizer():
 
     BASE_CONFIG.update(model_configs[CHOOSE_MODEL])
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
     settings, params = download_and_load_gpt2(model_size=model_size, models_dir="gpt2")
 
     gpt = GPTModel(BASE_CONFIG)
@@ -67,9 +67,9 @@ async def main(message: chainlit.Message):
     """
     The main Chainlit function.
     """
-    token_ids = generate(
+    token_ids = generate(  # function uses `with torch.no_grad()` internally already
         model=model,
-        idx=text_to_token_ids(message.content, tokenizer),  # The user text is provided via as `message.content`
+        idx=text_to_token_ids(message.content, tokenizer).to(device),  # The user text is provided via as `message.content`
         max_new_tokens=50,
         context_size=model_config["context_length"],
         top_k=1,
