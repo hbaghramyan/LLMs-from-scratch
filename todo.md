@@ -536,3 +536,60 @@ id(idx)
 5797275792
 idx_cond is idx
 False
+
+5. 
+
+Remember that figure 5.6 displays the softmax probabilities for a compact seven-token vocabulary to fit everything into a single figure. This implies that the starting random values will hover around 1/7, which equals approximately 0.14. However, the vocabulary we are using for our GPT-2 model has 50,257 tokens, so most of the initial probabilities will hover around 0.00002 (1/50,257).
+
+This applies only to the outputs of the model and not the embedding vectors. Each value of the embedding matrix
+is independent on the others. 
+
+torch.sum(tok_emb, dim=-1, keepdim=True).squeeze(dim=-1)
+tensor([[  0.4252,  13.5739, -26.4600,  -5.1018]])
+torch.sum(tok_emb, dim=-1, keepdim=True).squeeze(dim=-1).shape
+
+import torch
+torch.manual_seed(0)  # Set random seed for reproducibility
+
+# Create an embedding layer and get embeddings for specific indices
+embedding_layer = torch.nn.Embedding(10, 5)  # 10 is the max index, 5 is the embedding dimension
+idx = torch.tensor([2, 3, 1])
+embeddings_from_layer = embedding_layer(idx)
+
+# Now create a manual embedding matrix with the same random seed
+torch.manual_seed(0)  # Reset random seed to ensure the same random numbers are generated
+manual_embedding_matrix = torch.randn(10, 5)  # Same dimensions as the embedding layer
+embeddings_from_manual_matrix = manual_embedding_matrix[idx]
+
+6. : and [0, 1, 2] give different results:  
+
+probas[text_idx, :, targets[text_idx]]
+tensor([[7.4541e-05, 2.6072e-05, 1.8191e-05],
+        [2.5497e-05, 3.1061e-05, 2.7802e-05],
+        [3.2404e-05, 1.0943e-05, 1.1563e-05]])
+
+
+probas[text_idx, [0, 1, 2], targets[text_idx]]
+tensor([7.4541e-05, 3.1061e-05, 1.1563e-05])
+
+targets[0]
+tensor([3626, 6100,  345])
+
+the reason is to adjust the probabilities for each target in tensor([3626, 6100,  345]). 
+0th row in probas[0] contains probabilities for token 3626, 1st - for token  6100, 2nd for 345. Each row has 50257
+elements but only the 3626th element of 0th row is considered, 6100th for 1st row, and 345th for the 3rd row.  
+
+probas[0][0, 3626]
+tensor(7.4541e-05)
+probas[0][1, 6100]
+tensor(3.1061e-05)
+
+These targets respresent tokens in " effort moves you" 
+
+see the link to understand why
+
+https://tiktokenizer.vercel.app/?model=gpt2
+
+which means we need to 
+
+7. appendix B on logarithm
