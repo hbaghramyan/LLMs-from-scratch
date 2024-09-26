@@ -99,3 +99,5 @@ print(log_probas)
 
 avg_log_probas = torch.mean(log_probas)
 print(avg_log_probas)
+
+neg_avg_log_probas = avg_log_probas * -1

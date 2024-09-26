@@ -593,3 +593,32 @@ https://tiktokenizer.vercel.app/?model=gpt2
 which means we need to 
 
 7. appendix B on logarithm
+
+8. how do solve the probability problems
+
+
+id(idx0)
+13093152112
+id(idx)
+5228297360
+idx000 = idx[:]
+idx[0] = 1
+idx000
+tensor([[1, 1, 1, 1]])
+idx
+tensor([[1, 1, 1, 1]])
+
+30/09/2024
+
+0. nn_and_dl/course_01_nn_and_dl/w02/A02_done/Logistic_Regression_with_a_Neural_Network_mindset.ipynb
+
+1. ch05 5.1-ը լրիվ online գրքից, 
+
+ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
+
+2. Հավանականության գրքից, 1.9
+
+3. WHatsapp-ով ուղարկածս խնդիրը քննարկել
+
+4. Unit 4 Exercises 
+https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
