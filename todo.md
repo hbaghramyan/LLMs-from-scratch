@@ -622,3 +622,27 @@ ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
 
 4. Unit 4 Exercises 
 https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
+
+
+The trivial result for perplexity in this context can be understood as follows:
+
+1. **Perplexity Definition**: The perplexity is defined as $( 2^H )$, where $( H )$ is the entropy of the probability distribution. Perplexity gives an idea of how many possible outcomes there are for the random variable.
+
+2. **Calculating Entropy**: For a fair 6-sided die, the probability distribution is uniform, so each face has a probability of $( \frac{1}{6} )$. The entropy $( H )$ is given by:
+
+   $$
+   H = -\sum_{i=1}^{6} p(X = i) \log_2 p(X = i) = -6 \times \left(\frac{1}{6} \times \log_2 \frac{1}{6}\right).
+   $$
+   Simplifying this, we get:
+
+   $$
+   H = -\log_2 \frac{1}{6} = \log_2 6 \approx 2.58.
+   $$
+
+3. **Finding Perplexity**: Using the formula for perplexity:
+
+   $$
+   \text{perplexity} = 2^H = 2^{\log_2 6} = 6.
+   $$
+
+The result is trivial because, for a uniform distribution over $ n $ equally likely outcomes (in this case, $ n = 6 $ for the die), the perplexity directly equals the number of possible outcomes. Thus, for a fair die with 6 faces, the perplexity is simply 6, which reflects the six possible choices that the die could land on. This relationship holds generally for any uniform distribution over $ n $ outcomes, making it a straightforward result.
