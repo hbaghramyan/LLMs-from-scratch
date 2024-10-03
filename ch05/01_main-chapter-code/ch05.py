@@ -111,4 +111,24 @@ print("Flattened logits:", logits_flat.shape)
 print("Flattened targets:", targets_flat.shape)
 
 loss = torch.nn.functional.cross_entropy(logits_flat, targets_flat)
-print(loss)
+loss_manual = -torch.Tensor(
+    [
+        torch.log(logit[target.item()]).item()
+        for target, logit in zip(
+            targets_flat, torch.nn.functional.softmax(logits_flat, dim=-1)
+        )
+    ]
+).mean()
+
+print(f"Torch version of {loss} vs manual version of it {loss_manual}")
+
+# 5.1.3 Calculating the training and validation set losses
+
+file_path = "the-verdict.txt"
+with open(file_path, "r", encoding="utf-8") as file:
+    text_data = file.read()
+
+total_characters = len(text_data)
+total_tokens = len(tokenizer.encode(text_data))
+print("Characters:", total_characters)
+print("Tokens:", total_tokens)

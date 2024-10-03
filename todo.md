@@ -646,3 +646,16 @@ The trivial result for perplexity in this context can be understood as follows:
    $$
 
 The result is trivial because, for a uniform distribution over $ n $ equally likely outcomes (in this case, $ n = 6 $ for the die), the perplexity directly equals the number of possible outcomes. Thus, for a fair die with 6 faces, the perplexity is simply 6, which reflects the six possible choices that the die could land on. This relationship holds generally for any uniform distribution over $ n $ outcomes, making it a straightforward result.
+
+10/10/2024
+
+1. https://www.youtube.com/watch?v=fXOsFF95ifk&list=PLkDaE6sCZn6Ec-XTbcX1uRg2_u4xOEky0&index=25 - C1W3 բոլոր վիդեոները նայել
+
+2. ch05 5.1, 5.2 online գրքից
+
+3. ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
+
+4. WHatsapp-ով ուղարկածս խնդիրը քննարկել
+
+5. Unit 4 Exercises 
+https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
