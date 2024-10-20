@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, os.getcwd())
 
-from utils.utils_prev import GPTModel, generate_text_simple
+from utils.utils_prev import GPTModel, generate_text_simple, create_dataloader_v1
 
 # 5.1.1 Using GPT to generate text
 
@@ -18,6 +18,12 @@ GPT_CONFIG_124M = {
     "drop_rate": 0.1,  # Dropout rate
     "qkv_bias": False,  # Query-key-value bias
 }
+
+device = torch.device(
+    "mps"
+    if torch.backends.mps.is_available()
+    else "cuda" if torch.cuda.is_available() else "cpu"
+)
 
 torch.manual_seed(123)
 model = GPTModel(GPT_CONFIG_124M)
@@ -124,7 +130,7 @@ print(f"Torch version of {loss} vs manual version of it {loss_manual}")
 
 # 5.1.3 Calculating the training and validation set losses
 
-file_path = "the-verdict.txt"
+file_path = "ch05/01_main-chapter-code/the-verdict.txt"
 with open(file_path, "r", encoding="utf-8") as file:
     text_data = file.read()
 
@@ -132,3 +138,71 @@ total_characters = len(text_data)
 total_tokens = len(tokenizer.encode(text_data))
 print("Characters:", total_characters)
 print("Tokens:", total_tokens)
+
+train_ratio = 0.90
+split_idx = int(train_ratio * total_characters)
+train_data = text_data[:split_idx]
+val_data = text_data[:split_idx]
+
+torch.manual_seed(123)
+train_loader = create_dataloader_v1(
+    txt=train_data,
+    batch_size=2,
+    max_length=GPT_CONFIG_124M["context_length"],
+    stride=GPT_CONFIG_124M["context_length"],
+    drop_last=True,
+    shuffle=True,
+    num_workers=0,
+)
+
+val_loader = create_dataloader_v1(
+    txt=val_data,
+    batch_size=2,
+    max_length=GPT_CONFIG_124M["context_length"],
+    stride=GPT_CONFIG_124M["context_length"],
+    shuffle=False,
+    drop_last=False,
+    num_workers=0,
+)
+
+print("Train laoder:")
+for x, y in train_loader:
+    print(x.shape, y.shape)
+
+print("\nValidation loader:")
+for x, y in val_loader:
+    print(x.shape, y.shape)
+
+# Saniti check
+
+if total_tokens * train_ratio < GPT_CONFIG_124M["context_length"]:
+    print(
+        "Not enough tokens for the training loader. "
+        "Try to lower the `GPT_CONFIG_124M['context_length']` or "
+        "increase the `training_ratio`"
+    )
+
+if total_tokens * (1 - train_ratio) < GPT_CONFIG_124M["context_length"]:
+    print(
+        "Not enough tokens for the validation loader. "
+        "Try to lower the `GPT_CONFIG_124M['context_length']` or "
+        "decrease the `training_ratio`"
+    )
+
+train_tokens = 0
+for input_batch, target_batch in train_loader:
+    train_tokens += input_batch.numel()
+
+val_tokens = 0
+for input_batch, target_batch in val_loader:
+    val_tokens += input_batch.numel()
+
+
+def calc_loss_batch(input_batch, target_batch, model, device):
+    input_batch = input_batch.to(device)
+    target_batch = target_batch.to(device)
+    logits = model(input_batch)
+    loss = torch.nn.functional.cross_entropy(
+        input=logits.flatten(0, 1), target=targets.flatten()
+    )
+    return loss

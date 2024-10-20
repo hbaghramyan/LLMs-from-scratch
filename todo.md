@@ -659,3 +659,15 @@ The result is trivial because, for a uniform distribution over $ n $ equally lik
 
 5. Unit 4 Exercises 
 https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
+
+to discuss
+
+1. torch.tensor vs torch.Tensor
+https://stackoverflow.com/questions/51911749/what-is-the-difference-between-torch-tensor-and-torch-tensor
+
+2. 
+
+shuffle=False,
+drop_last=False,
+
+for validation
