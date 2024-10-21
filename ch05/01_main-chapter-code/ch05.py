@@ -142,7 +142,7 @@ print("Tokens:", total_tokens)
 train_ratio = 0.90
 split_idx = int(train_ratio * total_characters)
 train_data = text_data[:split_idx]
-val_data = text_data[:split_idx]
+val_data = text_data[split_idx:]
 
 torch.manual_seed(123)
 train_loader = create_dataloader_v1(
@@ -173,7 +173,7 @@ print("\nValidation loader:")
 for x, y in val_loader:
     print(x.shape, y.shape)
 
-# Saniti check
+# Sanity check
 
 if total_tokens * train_ratio < GPT_CONFIG_124M["context_length"]:
     print(
@@ -206,3 +206,28 @@ def calc_loss_batch(input_batch, target_batch, model, device):
         input=logits.flatten(0, 1), target=targets.flatten()
     )
     return loss
+
+
+def calc_loss_loader(data_loader, model, device, num_batches=None):
+    total_loss = 0.0
+    if len(data_loader) == 0:
+        return float("nan")
+    elif num_batches is None:
+        num_batches = len(data_loader)
+    else:
+        num_batches = min(num_batches, len(data_loader))
+    for i, (input_batch, target_batch) in enumerate(data_loader):
+        if i < num_batches:
+            loss = calc_loss_batch(input_batch, target_batch, model, device)
+            total_loss += loss.item()
+        else:
+            break
+    return total_loss / num_batches
+
+
+model.to(device=device)
+with torch.no_grad():
+    train_loss = calc_loss_loader(train_loader, model=model, device=device)
+    val_loss = calc_loss_loader(val_loader, model=model, device=device)
+print("Training loss:", train_loss)
+print("Validation loss:", val_loss)
