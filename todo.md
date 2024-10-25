@@ -714,3 +714,19 @@ Reasons for Setting drop_last=True in the Training Data Loader
 	•	Batch-wise Operations:
 	•	Some training strategies involve operations that assume a fixed batch size (e.g., certain types of data augmentation or batch-wise regularization techniques).
 	•	Having consistent batch sizes simplifies these implementations.
+
+
+10/10/2024
+
+1. Unit 4 Exercises 
+https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
+
+1. C1W3 առաջադրանքները
+
+2. 5.3 online գրքից
+
+3. ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
+
+4. WHatsapp-ով ուղարկածս խնդիրը քննարկել
+
+to discuss
