@@ -716,7 +716,7 @@ Reasons for Setting drop_last=True in the Training Data Loader
 	•	Having consistent batch sizes simplifies these implementations.
 
 
-10/10/2024
+13/11/2024
 
 1. Unit 4 Exercises 
 https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
