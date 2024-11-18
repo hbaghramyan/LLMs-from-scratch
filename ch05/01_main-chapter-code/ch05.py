@@ -272,8 +272,8 @@ def train_model_simple(
                     f"Train loss {train_loss:.3f}, "
                     f"Val loss {val_loss:.3f}"
                 )
-    generate_and_print_sample(model, tokenizer, device, start_context)
-    return train_losses, val_losses, track_tokens_seen
+        generate_and_print_sample(model, tokenizer, device, start_context)
+        return train_losses, val_losses, track_tokens_seen
 
 
 def evaluate_model(model, train_loader, val_loader, device, eval_iter):
@@ -336,3 +336,20 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
 
 epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
 plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+
+# 5.3 Decoding strategies to control randomness
+
+model.to(device=device)
+model.eval()
+
+tokenizer = tiktoken.get_encoding("gpt2")
+token_ids = generate_text_simple(
+    model=model,
+    idx=text_to_token_ids(text="Every effort moves you", tokenizer=tokenizer).to(
+        device
+    ),
+    max_new_tokens=25,
+    context_size=GPT_CONFIG_124M["context_length"],
+)
+
+print("Output text:\n", token_ids_to_text(token_ids=token_ids, tokenzer=tokenizer))
