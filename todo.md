@@ -721,12 +721,27 @@ Reasons for Setting drop_last=True in the Training Data Loader
 1. Unit 4 Exercises 
 https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
 
-1. C1W3 առաջադրանքները
+1. C1W3 առաջադրանքները - done
 
-2. 5.3 online գրքից
+2. 5.3 online գրքից - done
 
 3. ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
 
 4. WHatsapp-ով ուղարկածս խնդիրը քննարկել
 
 to discuss
+
+27/11/2024
+
+1. Unit 4 Exercises 
+https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neural-networks-overview/unit-4-exercises/
+
+1. C1W4 միայն վիդեոները -  https://www.youtube.com/watch?v=2gw5tE2ziqA&list=PLkDaE6sCZn6Ec-XTbcX1uRg2_u4xOEky0&index=36
+
+2. 5.3, 5.4 online գրքից
+
+3. ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
+
+4. WHatsapp-ով ուղարկածս խնդիրը քննարկել
+
+https://www.efinancialcareers.co.uk/news/2020/06/python-interview-questions-hedge-fund#:~:text=Python%20question%2010%3A%C2%A0What%20happens%20if%20you%20run%20this%20Python%20code%3F
