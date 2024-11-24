@@ -745,3 +745,30 @@ https://lightning.ai/courses/deep-learning-fundamentals/training-multilayer-neur
 4. WHatsapp-ով ուղարկածս խնդիրը քննարկել
 
 https://www.efinancialcareers.co.uk/news/2020/06/python-interview-questions-hedge-fund#:~:text=Python%20question%2010%3A%C2%A0What%20happens%20if%20you%20run%20this%20Python%20code%3F
+
+
+https://python-reference.readthedocs.io/en/latest/docs/functions/intern.html
+
+python will automatically intern strings that are small, or look like identifiers, so you may find you get no improvement because your strings are already being interned behind the scenes.
+
+a = "Python is a flexible programming language that offers various mechanisms"
+b = "Python is a flexible programming language that offers various mechanisms"
+a is b
+False
+a = "Hello"
+b = "Hello"
+a is b
+True
+
+
+a is b
+True
+a = "H"
+b = "H"
+a is b
+True
+a = "H "
+b = "H "
+a is b
+False
+
