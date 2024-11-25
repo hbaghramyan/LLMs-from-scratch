@@ -772,3 +772,6 @@ b = "H "
 a is b
 False
 
+5. Problem with MPS - I don't achieve the same results as with GPU and CPU - ch5.py
+
+6. 
