@@ -774,4 +774,8 @@ False
 
 5. Problem with MPS - I don't achieve the same results as with GPU and CPU - ch5.py
 
-6. 
+6. https://pytorch.org/docs/stable/distributions.html#categorical
+
+next_token_id = torch.multinomial(probas, num_samples=1)
+
+categorical is actually the distrubution used

@@ -19,7 +19,7 @@ GPT_CONFIG_124M = {
 }
 
 device = torch.device(
-    "mps"
+    "cpu"
     if torch.backends.mps.is_available()
     else "cuda" if torch.cuda.is_available() else "cpu"
 )
@@ -373,5 +373,7 @@ next_token_id = torch.argmax(probas).item()
 next_token = inverse_vocab[next_token_id]
 
 torch.manual_seed(123)
-next_token_id = torch.multinomial(probas, num_samples=1).item()
+next_token_id = torch.multinomial(probas, num_samples=1)
+
+# torch.distributions.categorical.Categorical()
 next_token = inverse_vocab[next_token_id]
