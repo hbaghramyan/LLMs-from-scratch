@@ -774,4 +774,22 @@ False
 
 5. Problem with MPS - I don't achieve the same results as with GPU and CPU - ch5.py
 
-6. 
+6. https://pytorch.org/docs/stable/distributions.html#categorical
+
+next_token_id = torch.multinomial(probas, num_samples=1)
+
+categorical is actually the distrubution used
+
+
+03/12/2024
+
+
+1. C1W4 առաջին առաջադրանքնը - 
+nn_and_dl/course_01_nn_and_dl/w04/A01/Building_your_Deep_Neural_Network_Step_by_Step.ipynb
+
+2. 5.3, 5.4 online գրքից - թող մնա նույնը
+
+3. ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
+
+4. Հավանականության գրքից, 1.9 առաջադրանքները
+
