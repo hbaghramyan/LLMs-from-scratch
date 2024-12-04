@@ -5,9 +5,9 @@ import sys
 import urllib.request
 import matplotlib.pyplot as plt
 
-# sys.path.insert(0, os.getcwd())
-# # from previous_chapters import GPTModel, generate_text_simple, create_dataloader_v1
-# from utils.utils_prev import GPTModel, generate_text_simple, create_dataloader_v1
+sys.path.insert(0, os.getcwd())
+# from previous_chapters import GPTModel, generate_text_simple, create_dataloader_v1
+from utils.utils_prev import GPTModel, generate_text_simple, create_dataloader_v1
 
 # GPT_CONFIG_124M = {
 #     "vocab_size": 50257,  # Vocabulary size
@@ -397,17 +397,31 @@ def softmax_with_temperature(logits, temperature):
 
 temperatures = [1, 0.1, 5]
 scaled_probas = [softmax_with_temperature(next_token_logits, T) for T in temperatures]
-x = torch.arange(len(vocab))
-bar_width = 0.15
-fig, ax = plt.subplots(figsize=(5, 3))
-for i, T in enumerate(temperatures):
-    rects = ax.bar(
-        x + i * bar_width, scaled_probas[i], bar_width, label=f"Temperature = {T}"
-    )
+# x = torch.arange(len(vocab))
+# bar_width = 0.15
+# fig, ax = plt.subplots(figsize=(5, 3))
+# for i, T in enumerate(temperatures):
+#     rects = ax.bar(
+#         x + i * bar_width, scaled_probas[i], bar_width, label=f"Temperature = {T}"
+#     )
 
-ax.set_ylabel("Probability")
-ax.set_xticks(x)
-ax.set_xticklabels(vocab.keys(), rotation=90)
-ax.legend()
-plt.tight_layout()
-plt.show()
+# ax.set_ylabel("Probability")
+# ax.set_xticks(x)
+# ax.set_xticklabels(vocab.keys(), rotation=90)
+# ax.legend()
+# plt.tight_layout()
+# plt.show()
+
+top_k = 3
+top_logits, top_pos = torch.topk(input=next_token_logits, k=top_k)
+print("Top logits:", top_logits)
+print("Top positionts", top_pos)
+
+new_logits = torch.where(
+    condition=next_token_logits < top_logits[-1],
+    input=torch.tensor(float("-inf")),
+    other=next_token_logits,
+)
+
+topk_probas = torch.softmax(new_logits, dim=0)
+print(topk_probas)
