@@ -793,3 +793,13 @@ nn_and_dl/course_01_nn_and_dl/w04/A01/Building_your_Deep_Neural_Network_Step_by_
 
 4. Հավանականության գրքից, 1.9 առաջադրանքները
 
+10/12/2024
+
+1. C1W4 երկրորդ առաջադրանքնը - 
+nn_and_dl/course_01_nn_and_dl/w04/A02/
+
+2. 5.3, 5.4 online գրքից - թող մնա նույնը
+
+3. ch02/03_bonus_embedding-vs-matmul/embeddings-and-linear-layers.ipynb
+
+4. Հավանականության գրքից, 1.10 միայն կարդալ, 1.9-ի առաջադրանքները վերջացնել
