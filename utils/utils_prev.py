@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import tiktoken
 from torch.utils.data import Dataset, DataLoader
+from zmq import device
 
 
 class SelfAttention_v1(nn.Module):
@@ -249,7 +250,7 @@ def generate_text_simple(
     # idx is (batch, n_tokens) array of indices in the current context
     """Return the indices of the generated text
     Args:
-        model (GPTModel): the model used for the inference
+        model (nn.Module): the model used for the inference
         idx (torch.Tensor): tokenized input
         max_new_tokens (int): maximum number of tokens to generate
         context_size (int): the maximum number of tokens the model can consider as input
@@ -260,7 +261,7 @@ def generate_text_simple(
     for _ in range(max_new_tokens):
         # Crop current context if it exceeds the supported context size
         # E.g., if LLM supports only 5 tokens, and the context size is 10
-        # the only the last 5 tokens are used as context
+        # only the last 5 tokens are used as context
         idx_cond = idx[:, -context_size:]
 
         # Get the predictions
@@ -279,6 +280,69 @@ def generate_text_simple(
 
         # Append sampled index to the running sequence
         idx = torch.cat((idx, idx_next), dim=1)  # (batch, n_tokens+1)
+
+    return idx
+
+
+def generate(
+    model: nn.Module,
+    idx: torch.Tensor,
+    max_new_tokens: int,
+    context_size: int,
+    temperature=0.0,
+    top_k=None,
+    eos_id=None,
+) -> torch.Tensor:
+
+    # idx is (batch, n_tokens) array of indices in the current context
+    """Return the indices of the generated text
+    Args:
+        model (GPTModel): the model used for the inference
+        idx (torch.Tensor): tokenized input
+        max_new_tokens (int): maximum number of tokens to generate
+        context_size (int): the maximum number of tokens the model can consider as input
+        temperature (float): temperature to control uniformity of the distribution
+        top_k (None): top k probability values that should be retained
+
+    Returns:
+        idx (torch.Tensor): tokenized input + output
+    """
+
+    for _ in range(max_new_tokens):
+        idx_cond = idx[:, -context_size:]
+        with torch.no_grad():
+            logits = model(idx_cond)
+        logits = logits[:, -1, :]
+
+        # New: Filter logits with top_k sampling
+        if top_k is not None:
+            # Keep only top_k values
+            top_logits, _ = torch.topk(logits, top_k)
+            min_val = top_logits[:, -1]
+            logits = torch.where(
+                logits < min_val, torch.Tensor(float("-inf")).to(logits.device), device
+            )
+
+        # New: Apply temperature scaling
+        if temperature > 0.0:
+            logits = logits / temperature
+
+            # Apply softmax to get probabilities
+            probs = torch.softmax(logits, dim=-1)
+
+            # Sample from the distrubution
+            idx_next = torch.multinomial(probs, num_samples=1)  # (batch_size, 1)
+
+        # Otherwise same as before: get idx of the vocab entry
+        # with the highest logits value
+        else:
+            idx_next = torch.argmax(logits, dim=-1, keepdim=True)  # (batch_size, 1)
+
+        if idx_next == eos_id:
+            break
+
+        # Same as before: append samples index to the running sequence
+        idx = torch.cat((idx, idx_next), dim=1)  # (batch_size, num_tokens+1)
 
     return idx
 
