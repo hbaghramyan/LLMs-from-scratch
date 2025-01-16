@@ -793,7 +793,7 @@ nn_and_dl/course_01_nn_and_dl/w04/A01/Building_your_Deep_Neural_Network_Step_by_
 
 4. Հավանականության գրքից, 1.9 առաջադրանքները
 
-10/12/2024
+17/01/2025
 
 1. C1W4 երկրորդ առաջադրանքնը - 
 nn_and_dl/course_01_nn_and_dl/w04/A02/
