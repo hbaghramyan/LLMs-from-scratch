@@ -803,3 +803,32 @@ https://www.youtube.com/watch?v=1waHlpKiNyY&list=PLpFsSf5Dm-pd5d3rjNtIXUHT-v7bda
 3. ch02/04_bonus_dataloader-intuition/dataloader-intuition.ipynb
 
 4. Հավանականության գրքից, 1.10 առաջադրանքները վերջացնել
+
+discuss
+
+1. 
+def print_sampled_tokens(probas):
+    torch.manual_seed(123) # Manual seed for reproducibility
+    sample = [torch.multinomial(probas, num_samples=1).item() for i in range(1_000)]
+    sampled_ids = torch.bincount(torch.tensor(sample))
+    for i, freq in enumerate(sampled_ids):
+        print(f"{freq} x {inverse_vocab[i]}")
+
+print_sampled_tokens(probas)
+
+here torch.manual_seed(123) assures the reproducibility for the whole sequence and not for individual 
+torch.multinomial(probas, num_samples=1).item(), ie., we won't get all forwards as in 
+
+torch.manual_seed(123)
+next_token_id = torch.multinomial(probas, num_samples=1).item()
+print(inverse_vocab[next_token_id]
+
+10/02/2025
+
+1. nn_and_dl/course_02_improving_dnn/w05/A01
+
+2. online գրքից 5-i բոլոր առաջադրանքները
+
+3. ch02/04_bonus_dataloader-intuition/dataloader-intuition.ipynb
+
+4. Հավանականության գրքից, 1.11

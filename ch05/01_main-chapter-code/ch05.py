@@ -339,22 +339,22 @@ train_losses, val_losses, tokens_seen = train_model_simple(
 
 epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
 
-# # 5.3 Decoding strategies to control randomness
+# 5.3 Decoding strategies to control randomness
 
-# model.to(device=device)
-# model.eval()
+model.to(device=device)
+model.eval()
 
-# tokenizer = tiktoken.get_encoding("gpt2")
-# token_ids = generate_text_simple(
-#     model=model,
-#     idx=text_to_token_ids(text="Every effort moves you", tokenizer=tokenizer).to(
-#         device
-#     ),
-#     max_new_tokens=25,
-#     context_size=GPT_CONFIG_124M["context_length"],
-# )
+tokenizer = tiktoken.get_encoding("gpt2")
+token_ids = generate_text_simple(
+    model=model,
+    idx=text_to_token_ids(text="Every effort moves you", tokenizer=tokenizer).to(
+        device
+    ),
+    max_new_tokens=25,
+    context_size=GPT_CONFIG_124M["context_length"],
+)
 
-# print("Output text:\n", token_ids_to_text(token_ids=token_ids, tokenzer=tokenizer))
+print("Output text:\n", token_ids_to_text(token_ids=token_ids, tokenzer=tokenizer))
 
 # 5.3.1 Temperature scaling
 
