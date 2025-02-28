@@ -13,8 +13,22 @@ If you already have a Python installation on your machine, the quickest way to g
 pip install -r requirements.txt
 ```
 
-&nbsp;
+<br>
 
+> **Note:** If you are running any of the notebooks on Google Colab and want to install the dependencies, simply run the following code in a new cell at the top of the notebook:
+> `pip install uv && uv pip install --system -r https://raw.githubusercontent.com/rasbt/LLMs-from-scratch/refs/heads/main/requirements.txt`
+
+
+
+In the video below, I share my personal approach to setting up a Python environment on my computer:
+
+<br>
+<br>
+
+[![Link to the video](https://img.youtube.com/vi/yAcWnfsZhzo/0.jpg)](https://www.youtube.com/watch?v=yAcWnfsZhzo)
+
+
+&nbsp;
 # Local Setup
 
 This section provides recommendations for running the code in this book locally. Note that the code in the main chapters of this book is designed to run on conventional laptops within a reasonable timeframe and does not require specialized hardware. I tested all main chapters on an M3 MacBook Air laptop. Additionally, if your laptop or desktop computer has an NVIDIA GPU, the code will automatically take advantage of it.

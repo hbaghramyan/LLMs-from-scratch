@@ -244,6 +244,9 @@ celerybeat.pid
 # Environments
 .env
 .venv
+.python-version
+uv.lock
+pixi.lock
 env/
 venv/
 ENV/
@@ -284,5 +287,6 @@ cython_debug/
 # vscode
 .vscode/
 
-# Armenia files
-store.zip
+# pixi environments
+.pixi
+*.egg-info
