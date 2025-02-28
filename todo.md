@@ -827,8 +827,19 @@ print(inverse_vocab[next_token_id]
 
 1. nn_and_dl/course_02_improving_dnn/w05/A01
 
-2. online գրքից 5-i բոլոր առաջադրանքները
-
 3. ch02/04_bonus_dataloader-intuition/dataloader-intuition.ipynb
 
 4. Հավանականության գրքից, 1.11
+
+??/03/2025
+
+1. nn_and_dl/course_02_improving_dnn/w05/A02
+
+2. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - սա կվերցնենք tokenizer-ի համար, 
+սկզբի համար պետք չի հասկանալ թ ամբող BPETokenizerSimple ոնց ա աշխատում
+1-ին սեկցիան ա պետք նայել մինչև BPETokenizerSimple, ու train անել իրա տված տեքստով
+
+3. ch06/01_main-chapter-code/ch06.ipynb 6.1, 6.2
+
+4. Հավանականության գրքից, 2.1 միայն կարդալ
+
