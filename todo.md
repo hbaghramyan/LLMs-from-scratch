@@ -843,3 +843,13 @@ print(inverse_vocab[next_token_id]
 
 4. Հավանականության գրքից, 2.1 միայն կարդալ
 
+17/03/2025
+
+1. C2W2 videos beginning from https://youtu.be/4qJaSmvhxi8?si=keU88OA0VDNoORH_
+
+2. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - BPETokenizerSimple train method undertand
+
+3. ch06/01_main-chapter-code/ch06.ipynb 6.3
+
+4. Հավանականության գրքից, 2 առաջադրանքները
+
