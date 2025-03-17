@@ -849,7 +849,19 @@ print(inverse_vocab[next_token_id]
 
 2. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - BPETokenizerSimple train method undertand
 
-3. ch06/01_main-chapter-code/ch06.ipynb 6.3
+3. ch06/01_main-chapter-code/ch06.ipynb 6.2
 
 4. Հավանականության գրքից, 2 առաջադրանքները
 
+24/03/2025
+
+
+1. https://stackoverflow.com/questions/136097/what-is-the-difference-between-staticmethod-and-classmethod-in-python
+
+2. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - BPETokenizerSimple encode and decode methods undertand
+
+3. C2W2 exercises nn_and_dl/course_02_improving_dnn/w06/Optimization_methods.ipynb
+
+4. ch06/01_main-chapter-code/ch06.ipynb 6.2
+
+5. Հավանականության գրքից, 2 առաջադրանքները

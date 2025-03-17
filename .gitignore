@@ -1,3 +1,7 @@
+sms_spam_collection.zip
+sms_spam_collection/readme
+sms_spam_collection/SMSSpamCollection.tsv
+
 # Configs and keys
 ch05/07_gpt_to_llama/config.json
 ch07/02_dataset-utilities/config.json
