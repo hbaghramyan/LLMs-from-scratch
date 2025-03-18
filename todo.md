@@ -858,6 +858,8 @@ print(inverse_vocab[next_token_id]
 
 1. https://stackoverflow.com/questions/136097/what-is-the-difference-between-staticmethod-and-classmethod-in-python
 
+https://www.programiz.com/python-programming/decorator
+
 2. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - BPETokenizerSimple encode and decode methods undertand
 
 3. C2W2 exercises nn_and_dl/course_02_improving_dnn/w06/Optimization_methods.ipynb
