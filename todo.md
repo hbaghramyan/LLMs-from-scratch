@@ -867,3 +867,18 @@ https://www.programiz.com/python-programming/decorator
 4. ch06/01_main-chapter-code/ch06.ipynb 6.2
 
 5. Հավանականության գրքից, 2 առաջադրանքները
+
+Discuss
+
+with open(zip_path, "wb") as out_file: - the reason why "wb"
+
+31.03.2025
+
+1. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - the whole notebook
+
+2. ch06/01_main-chapter-code/ch06.ipynb 6.3
+
+3. Հավանականության գրքից, 2 առաջադրանքները
+
+4. https://youtu.be/AXDByU3D1hA?si=be1WvCclESZZSMoJ - till the end of C2W3
+
