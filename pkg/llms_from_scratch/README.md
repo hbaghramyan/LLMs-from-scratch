@@ -50,11 +50,12 @@ Once installed, you can import code from any chapter using:
 from llms_from_scratch.ch02 import GPTDatasetV1, create_dataloader_v1
 
 from llms_from_scratch.ch03 import (
-    MultiHeadAttention,
     SelfAttention_v1,
     SelfAttention_v2,
     CausalAttention,
-    MultiHeadAttentionWrapper
+    MultiHeadAttentionWrapper,
+    MultiHeadAttention,
+    PyTorchMultiHeadAttention # Bonus: Faster variant using PyTorch's scaled_dot_product_attention
 )
 
 from llms_from_scratch.ch04 import (
@@ -63,6 +64,7 @@ from llms_from_scratch.ch04 import (
     FeedForward,
     TransformerBlock,
     GPTModel,
+    GPTModelFast # Bonus: Faster variant using PyTorch's scaled_dot_product_attention
     generate_text_simple
 )
 
@@ -77,7 +79,8 @@ from llms_from_scratch.ch05 import (
     token_ids_to_text,
     calc_loss_batch,
     calc_loss_loader,
-    plot_losses
+    plot_losses,
+    download_and_load_gpt2
 )
 
 from llms_from_scratch.ch06 import (
@@ -106,5 +109,13 @@ from llms_from_scratch.ch07 import (
 from llms_from_scratch.appendix_a import NeuralNetwork, ToyDataset
 
 from llms_from_scratch.appendix_d import find_highest_gradient, train_model
+
+from llms_from_scratch.llama3 import (
+    Llama3Model,
+    Llama3Tokenizer,
+    ChatFormat,
+    clean_text
+)
 ```
 
+(For the `llms_from_scratch.llama3` usage information, please see [this bonus section](../../ch05/07_gpt_to_llama/README.md).
