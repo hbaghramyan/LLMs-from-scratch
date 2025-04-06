@@ -882,3 +882,44 @@ with open(zip_path, "wb") as out_file: - the reason why "wb"
 
 4. https://youtu.be/AXDByU3D1hA?si=be1WvCclESZZSMoJ - till the end of C2W3
 
+1. Why does Dropout work?
+
+magine your neural network like a group of students trying to solve a problem:
+	•	If all students always work together, maybe one or two do all the work and the others just follow.
+	•	But if, every time, a random few students are absent, everyone has to stay sharp and contribute — because anyone could be missing next time.
+
+This is what dropout does:
+	•	It prevents co-adaptation — where neurons rely too much on each other.
+	•	It encourages redundancy: each neuron has to learn useful, general features on its own.
+	•	The model becomes more robust to missing signals.
+
+2. Why L1 regularisation results in sparce matrices
+
+https://blog.mlreview.com/l1-norm-regularization-and-sparsity-explained-for-dummies-5b0e4be3938a
+
+- The size of the lookup table is a hyperparameter, also called "vocabulary size" (for GPT-2, that's
+50,257)
+
+**3. Repeat until no gains**
+
+- Keep repeating steps 1 and 2, continually merging the most frequent pairs
+- Stop when no further compression is possible (e.g., no pair occurs more than once)
+
+3. tokens.append("Ġ" + word)  # Ensure it's marked as a new segment
+
+because after a newline, the next word also typically starts with a space in real text, and the tokenizer treats it that way.
+
+4. Discuss the findall problem
+
+import re
+
+text = "abaabaabaabaae"
+vows = "AaOoUuIiEe"
+cons = "QWRTYPSDFGHJKLZXCVBNMqwrtypsdfghjklzxcvbnm"
+pattern = rf'[{cons}]([{vows}]{{2,}})[{cons}]'
+matches = re.findall(pattern, text)
+if matches:
+    for x in matches:
+        print(x)
+else:
+    print(-1)
