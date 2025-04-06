@@ -162,7 +162,9 @@ class BPETokenizerSimple:
         token_ids = []
         for token in tokens:
             if token in self.inverse_vocab:
-                # token is contained in the vocabulary as is
+                # token (which is actually a word with a space or not, 
+                # depends if not the first word) 
+                # is contained in the vocabulary as is
                 token_ids.append(self.inverse_vocab[token])
             else:
                 # Attempt to handle subword tokenization via BPE
@@ -196,6 +198,8 @@ class BPETokenizerSimple:
                 i = 0
                 while i < len(token_ids) - 1:
                     pair = (token_ids[i], token_ids[i + 1])
+                    # we search for pair in self.bpe_merges
+                    # because merged pairs are only there
                     if pair in self.bpe_merges:
                         merged_token_id = self.bpe_merges[pair]
                         new_tokens.append(merged_token_id)

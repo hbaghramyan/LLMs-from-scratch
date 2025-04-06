@@ -36,6 +36,6 @@ print(len(tokenizer.vocab))
 
 print(len(tokenizer.bpe_merges))
 
-input_text = "Jack embraced beauty through art and life."
+input_text = "Jack embraced beauty through art and life.\nMarie loves Jack"
 token_ids = tokenizer.encode(input_text)
 print(token_ids)
