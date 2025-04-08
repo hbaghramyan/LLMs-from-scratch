@@ -923,3 +923,20 @@ if matches:
         print(x)
 else:
     print(-1)
+
+5. We need to undestand then during tokenization only the token with highest number of chars should be considered
+
+list(self.vocab.values())[256:300]
+['Ġ', '<|endoftext|>', 'eĠ', 'Ġt', 'dĠ', 'tĠ', 'in', 'sĠ', 'heĠ', 'ha', ',Ġ', 'ou', 'er', 'an', 'on', 'en', 'ĠtheĠ', 'yĠ', '.Ġ', 'oĠ', 'ing', 'hi', 'it', 'edĠ', 'IĠ', 'of', 'wa', 'st', '--', 're', 'or', 'Ġa', '\n\n', 'at', 'el', 'ar', 'andĠ', 'ur', 'ĠtoĠ', 'ow', 'be', 'ofĠ', 'ingĠ', 'is']
+
+14.04.2025
+
+1. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - tokenize_with_bpe and decode modules understand thoroughly
+
+2. ch06/01_main-chapter-code/ch06.ipynb 6.3
+
+3. Հավանականության գրքից, 2 առաջադրանքները
+
+4. https://youtu.be/AXDByU3D1hA?si=be1WvCclESZZSMoJ - till the end of C2W3
+
+5. եթե ունենաս ժամանակ https://www.hackerrank.com/challenges/re-start-re-end/
