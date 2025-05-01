@@ -929,7 +929,7 @@ else:
 list(self.vocab.values())[256:300]
 ['Ġ', '<|endoftext|>', 'eĠ', 'Ġt', 'dĠ', 'tĠ', 'in', 'sĠ', 'heĠ', 'ha', ',Ġ', 'ou', 'er', 'an', 'on', 'en', 'ĠtheĠ', 'yĠ', '.Ġ', 'oĠ', 'ing', 'hi', 'it', 'edĠ', 'IĠ', 'of', 'wa', 'st', '--', 're', 'or', 'Ġa', '\n\n', 'at', 'el', 'ar', 'andĠ', 'ur', 'ĠtoĠ', 'ow', 'be', 'ofĠ', 'ingĠ', 'is']
 
-14.04.2025
+21.04.2025
 
 1. ch02/05_bpe-from-scratch/bpe-from-scratch.ipynb - tokenize_with_bpe and decode modules understand thoroughly
 
@@ -940,3 +940,46 @@ list(self.vocab.values())[256:300]
 4. https://youtu.be/AXDByU3D1hA?si=be1WvCclESZZSMoJ - till the end of C2W3
 
 5. եթե ունենաս ժամանակ https://www.hackerrank.com/challenges/re-start-re-end/
+
+    def find_freq_pair(token_ids, mode="most"):
+        # this happends when we have only one token or no tokens
+        pairs = Counter(zip(token_ids, token_ids[1:]))
+
+1.
+
+Your current code uses a deque (double-ended queue) for popleft() operations, which are O(1) in time complexity. With a regular Python list, however:
+	•	list.pop(0) is O(n), because all remaining elements must be shifted one position to the left.
+
+How popleft() works:
+	•	deque is a doubly-linked list under the hood.
+	•	Each element points to the next and previous ones.
+	•	So popleft() just updates a reference — no shifting needed.
+	•	This makes popleft() → O(1) time complexity.
+
+2. 
+
+builind self.bpe_merge and self.encode() follows the same path - first match the pair with the highest rate
+
+
+05.05.2025
+
+HB questions
+
+1. 
+is there any end of line char in python?
+
+iloc vs loc in pandas
+
+numpy array vs list vs deq list
+
+2. ch06/01_main-chapter-code/ch06.ipynb 6.3 - I need to revise this first
+
+3. Հավանականության գրքից, 2 առաջադրանքները
+
+4. https://youtu.be/AXDByU3D1hA?si=be1WvCclESZZSMoJ - till the end of C2W3
+
+5. եթե ունենաս ժամանակ https://www.hackerrank.com/challenges/re-start-re-end/
+
+    def find_freq_pair(token_ids, mode="most"):
+        # this happends when we have only one token or no tokens
+        pairs = Counter(zip(token_ids, token_ids[1:]))

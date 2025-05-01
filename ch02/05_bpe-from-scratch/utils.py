@@ -41,9 +41,7 @@ class BPETokenizerSimple:
         # Initialize vocab with unique characters, including "Ġ" if present
         # Start with the first 256 ASCII characters
         unique_chars = [chr(i) for i in range(256)]
-        unique_chars.extend(
-            char for char in sorted(set(processed_text)) if char not in unique_chars
-        )
+        unique_chars.extend(char for char in sorted(set(processed_text)) if char not in unique_chars)
         if "Ġ" not in unique_chars:
             unique_chars.append("Ġ")
 
@@ -64,6 +62,7 @@ class BPETokenizerSimple:
         # BPE steps 1-3: Repeatedly find and replace frequent pairs
         for new_id in range(len(self.vocab), vocab_size):
             pair_id = self.find_freq_pair(token_ids, mode="most")
+            # this happends when we have only one token or no tokens
             if pair_id is None:
                 break
             token_ids = self.replace_pair(token_ids, pair_id, new_id)
@@ -95,11 +94,7 @@ class BPETokenizerSimple:
             # Use an existing token ID as a placeholder for '\n'
             # Preferentially use "<|endoftext|>" if available
             fallback_token = next(
-                (
-                    token
-                    for token in ["<|endoftext|>", "Ġ", ""]
-                    if token in self.inverse_vocab
-                ),
+                (token for token in ["<|endoftext|>", "Ġ", ""] if token in self.inverse_vocab),
                 None,
             )
             if fallback_token is not None:
@@ -128,9 +123,7 @@ class BPETokenizerSimple:
                         self.bpe_ranks[(token1, token2)] = rank
                         rank += 1
                     else:
-                        print(
-                            f"Skipping pair {pair} as one token is not in the vocabulary."
-                        )
+                        print(f"Skipping pair {pair} as one token is not in the vocabulary.")
 
     def encode(self, text):
         """
@@ -162,8 +155,8 @@ class BPETokenizerSimple:
         token_ids = []
         for token in tokens:
             if token in self.inverse_vocab:
-                # token (which is actually a word with a space or not, 
-                # depends if not the first word) 
+                # token (which is actually a word with a space or not,
+                # depends if not the first word)
                 # is contained in the vocabulary as is
                 token_ids.append(self.inverse_vocab[token])
             else:
@@ -206,7 +199,8 @@ class BPETokenizerSimple:
                         # Uncomment for educational purposes:
                         # print(f"Merged pair {pair} -> {merged_token_id} ('{self.vocab[merged_token_id]}')")
                         i += 2  # Skip the next token as it's merged
-                        can_merge = True
+                        can_merge = True  # we set this to True so that the outer while can work
+                        # can_merge is needed because otherwise the cylce can run infinitely
                     else:
                         new_tokens.append(token_ids[i])
                         i += 1
@@ -245,11 +239,7 @@ class BPETokenizerSimple:
             i = 0
             while i < len(symbols):
                 # If we see (first, second) at position i, merge them
-                if (
-                    i < len(symbols) - 1
-                    and symbols[i] == first
-                    and symbols[i + 1] == second
-                ):
+                if i < len(symbols) - 1 and symbols[i] == first and symbols[i + 1] == second:
                     new_symbols.append(first + second)  # merged symbol
                     i += 2
                 else:
@@ -275,7 +265,7 @@ class BPETokenizerSimple:
             str: The decoded string.
         """
         decoded_string = ""
-        for i, token_id in enumerate(token_ids):
+        for _, token_id in enumerate(token_ids):
             if token_id not in self.vocab:
                 raise ValueError(f"Token ID {token_id} not found in vocab.")
             token = self.vocab[token_id]
@@ -303,10 +293,7 @@ class BPETokenizerSimple:
 
         # Save BPE merges as a list of dictionaries
         with open(bpe_merges_path, "w", encoding="utf-8") as file:
-            merges_list = [
-                {"pair": list(pair), "new_id": new_id}
-                for pair, new_id in self.bpe_merges.items()
-            ]
+            merges_list = [{"pair": list(pair), "new_id": new_id} for pair, new_id in self.bpe_merges.items()]
             json.dump(merges_list, file, ensure_ascii=False, indent=2)
 
     def load_vocab_and_merges(self, vocab_path, bpe_merges_path):
@@ -338,7 +325,7 @@ class BPETokenizerSimple:
     @staticmethod
     def find_freq_pair(token_ids, mode="most"):
         pairs = Counter(zip(token_ids, token_ids[1:]))
-
+        # this happends when we have only one token or no tokens
         if not pairs:
             return None
 
