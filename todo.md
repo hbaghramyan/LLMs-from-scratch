@@ -966,11 +966,55 @@ builind self.bpe_merge and self.encode() follows the same path - first match the
 HB questions
 
 1. 
-is there any end of line char in python?
+    
+    * is there any end of line char in python?
 
-iloc vs loc in pandas
+    In Python, when you do:
+    print("Hello")
+    an end-of-line (EOL) character is automatically added by default. Specifically, print() adds a newline character \n at the end of the string it prints.
 
-numpy array vs list vs deq list
+    print("Hello")
+    print("World")
+
+    will give
+
+    Hello
+    World
+
+    but
+
+    print("Hello", sep="")
+    print("World")
+
+    HelloWorld
+
+2. iloc vs loc in pandas
+
+    >>> import pandas as pd
+    >>> s = pd.Series(list("abcdef"), index=[49, 48, 47, 0, 1, 2])
+    >>> s
+    49    a
+    48    b
+    47    c
+    0     d
+    1     e
+    2     f
+    dtype: object
+    >>> s.loc[0]
+    ... 
+    KeyboardInterrupt
+    >>> s.loc[0]
+    'd'
+    >>> s.iloc[0]
+    'a'
+
+numpy array vs list vs deque list
+
+>>> my_list = [10, 20, 30, 40]
+>>> id(my_list)
+4373695808
+>>> [id(i) for i in my_list]
+[4342252312, 4342252632, 4342252952, 4342253272]
 
 2. ch06/01_main-chapter-code/ch06.ipynb 6.3 - I need to revise this first
 
@@ -983,3 +1027,25 @@ numpy array vs list vs deq list
     def find_freq_pair(token_ids, mode="most"):
         # this happends when we have only one token or no tokens
         pairs = Counter(zip(token_ids, token_ids[1:]))
+
+        
+ 12.05.2025       
+
+1. numpy array vs list
+
+կարծում արժի ծախսել ժամանակ ու րանք նայել
+
+2. Prepare the dataset. We can focus on the store/5tv as an example. Use as an example https://github.com/Aananda-giri/GPT2-Nepali/tree/main/1.%20preprocessing
+and clean.py file - this would be the task for the next week.
+
+https://www.geeksforgeeks.org/python-lists-vs-numpy-arrays/
+
+3. ch06/01_main-chapter-code/ch06.ipynb 6.3 and 6.4
+
+4. Հավանականության գրքից, 2 առաջադրանքները
+
+5. https://youtu.be/AXDByU3D1hA?si=be1WvCclESZZSMoJ - till the end of C2W3
+
+19.05.2025  
+
+https://realpython.com/queue-in-python/
