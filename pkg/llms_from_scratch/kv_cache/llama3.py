@@ -3,12 +3,13 @@
 #   - https://www.manning.com/books/build-a-large-language-model-from-scratch
 # Code: https://github.com/rasbt/LLMs-from-scratch
 
+from .utils import KVCache   # noqa: F401
+
 import os
 from pathlib import Path
 
 import torch
 import torch.nn as nn
-
 import tiktoken
 from tiktoken.load import load_tiktoken_bpe
 
@@ -74,19 +75,45 @@ class Llama3Model(nn.Module):
         self.register_buffer("cos", cos, persistent=False)
         self.register_buffer("sin", sin, persistent=False)
         self.cfg = cfg
+        self.current_pos = 0  # Track current position in KV cache
 
-    def forward(self, in_idx):
+    def forward(self, in_idx, use_cache=False, cache=None):
         tok_embeds = self.tok_emb(in_idx)
         x = tok_embeds
 
         num_tokens = x.shape[1]
-        mask = torch.triu(torch.ones(num_tokens, num_tokens, device=x.device, dtype=torch.bool), diagonal=1)
+        if use_cache:
+            pos_start = self.current_pos
+            pos_end = pos_start + num_tokens
+            self.current_pos = pos_end
+            mask = torch.triu(
+                torch.ones(pos_end, pos_end, device=x.device, dtype=torch.bool), diagonal=1
+            )[pos_start:pos_end, :pos_end]
+        else:
+            pos_start = 0  # Not strictly necessary but helps torch.compile
+            mask = torch.triu(
+                torch.ones(num_tokens, num_tokens, device=x.device, dtype=torch.bool), diagonal=1
+            )
+        # Shape (1, 1, num_tokens, num_tokens) to broadcast across batch and heads
+        mask = mask[None, None, :, :]
 
-        for block in self.trf_blocks:
-            x = block(x, mask, self.cos, self.sin)
+        next_cache = []
+        for i, block in enumerate(self.trf_blocks):
+            blk_cache = cache.get(i) if cache else None
+            x, new_blk_cache = block(x, mask, self.cos, self.sin,
+                                     use_cache=use_cache,
+                                     start_pos=pos_start,
+                                     cache=blk_cache)
+            if cache:
+                cache.update(i, new_blk_cache)
+            next_cache.append(new_blk_cache)
+
         x = self.final_norm(x)
         logits = self.out_head(x.to(self.cfg["dtype"]))
         return logits
+
+    def reset_kv_cache(self):
+        self.current_pos = 0
 
 
 class TransformerBlock(nn.Module):
@@ -103,11 +130,11 @@ class TransformerBlock(nn.Module):
         self.norm1 = nn.RMSNorm(cfg["emb_dim"], eps=1e-5, dtype=cfg["dtype"])
         self.norm2 = nn.RMSNorm(cfg["emb_dim"], eps=1e-5, dtype=cfg["dtype"])
 
-    def forward(self, x, mask, cos, sin):
+    def forward(self, x, mask, cos, sin, use_cache=False, start_pos=0, cache=None):
         # Shortcut connection for attention block
         shortcut = x
         x = self.norm1(x)
-        x = self.att(x, mask, cos, sin)  # Shape [batch_size, num_tokens, emb_size]
+        x, next_cache = self.att(x, mask, cos, sin, use_cache=use_cache, start_pos=start_pos, cache=cache)  # Shape [batch_size, num_tokens, emb_size]
         x = x + shortcut  # Add the original input back
 
         # Shortcut connection for feed-forward block
@@ -116,7 +143,7 @@ class TransformerBlock(nn.Module):
         x = self.ff(x)
         x = x + shortcut  # Add the original input back
 
-        return x
+        return x, next_cache
 
 
 class FeedForward(nn.Module):
@@ -153,26 +180,35 @@ class GroupedQueryAttention(nn.Module):
         self.W_query = nn.Linear(d_in, d_out, bias=False, dtype=dtype)
         self.out_proj = nn.Linear(d_out, d_out, bias=False, dtype=dtype)
 
-    def forward(self, x, mask, cos, sin):
-        b, num_tokens, d_in = x.shape
+    def forward(self, x, mask, cos, sin, use_cache=False, start_pos=0, cache=None):
+        b, num_tokens, _ = x.shape
 
-        queries = self.W_query(x)  # Shape: (b, num_tokens, d_out)
-        keys = self.W_key(x)  # Shape: (b, num_tokens, num_kv_groups * head_dim)
-        values = self.W_value(x)  # Shape: (b, num_tokens, num_kv_groups * head_dim)
+        # Apply projections
+        queries = self.W_query(x)  # (b, num_tokens, num_heads * head_dim)
+        keys = self.W_key(x)       # (b, num_tokens, num_kv_groups * head_dim)
+        values = self.W_value(x)   # (b, num_tokens, num_kv_groups * head_dim)
 
-        # Reshape queries, keys, and values
-        queries = queries.view(b, num_tokens, self.num_heads, self.head_dim)
-        keys = keys.view(b, num_tokens, self.num_kv_groups, self.head_dim)
-        values = values.view(b, num_tokens, self.num_kv_groups, self.head_dim)
-
-        # Transpose keys, values, and queries
-        keys = keys.transpose(1, 2)  # Shape: (b, num_kv_groups, num_tokens, head_dim)
-        values = values.transpose(1, 2)  # Shape: (b, num_kv_groups, num_tokens, head_dim)
-        queries = queries.transpose(1, 2)  # Shape: (b, num_heads, num_tokens, head_dim)
+        # Reshape
+        queries = queries.view(b, num_tokens, self.num_heads, self.head_dim).transpose(1, 2)
+        keys_new = keys.view(b, num_tokens, self.num_kv_groups, self.head_dim).transpose(1, 2)
+        values_new = values.view(b, num_tokens, self.num_kv_groups, self.head_dim).transpose(1, 2)
 
         # Apply RoPE
-        keys = apply_rope(keys, cos, sin)
-        queries = apply_rope(queries, cos, sin)
+        queries = apply_rope(queries, cos, sin, offset=start_pos)
+        keys_new = apply_rope(keys_new, cos, sin, offset=start_pos)
+
+        if use_cache:
+            if cache is None:
+                keys = keys_new
+                values = values_new
+            else:
+                prev_k, prev_v = cache
+                keys = torch.cat([prev_k, keys_new], dim=2)
+                values = torch.cat([prev_v, values_new], dim=2)
+            next_cache = (keys, values)
+        else:
+            keys, values = keys_new, values_new
+            next_cache = None
 
         # Expand keys and values to match the number of heads
         # Shape: (b, num_heads, num_tokens, head_dim)
@@ -202,7 +238,7 @@ class GroupedQueryAttention(nn.Module):
         context_vec = context_vec.reshape(b, num_tokens, self.d_out)
         context_vec = self.out_proj(context_vec)  # optional projection
 
-        return context_vec
+        return context_vec, next_cache
 
 
 def compute_rope_params(head_dim, theta_base=10_000, context_length=4096, freq_config=None, dtype=torch.float32):
@@ -250,7 +286,7 @@ def compute_rope_params(head_dim, theta_base=10_000, context_length=4096, freq_c
     return cos, sin
 
 
-def apply_rope(x, cos, sin):
+def apply_rope(x, cos, sin, offset=9):
     # x: (batch_size, num_heads, seq_len, head_dim)
     batch_size, num_heads, seq_len, head_dim = x.shape
     assert head_dim % 2 == 0, "Head dimension must be even"
@@ -260,8 +296,8 @@ def apply_rope(x, cos, sin):
     x2 = x[..., head_dim // 2:]  # Second half
 
     # Adjust sin and cos shapes
-    cos = cos[:seq_len, :].unsqueeze(0).unsqueeze(0)  # Shape: (1, 1, seq_len, head_dim)
-    sin = sin[:seq_len, :].unsqueeze(0).unsqueeze(0)
+    cos = cos[offset:offset + seq_len, :].unsqueeze(0).unsqueeze(0)  # Shape: (1, 1, seq_len, head_dim)
+    sin = sin[offset:offset + seq_len, :].unsqueeze(0).unsqueeze(0)
 
     # Apply the rotary transformation
     rotated = torch.cat((-x2, x1), dim=-1)
