@@ -1049,3 +1049,10 @@ https://www.geeksforgeeks.org/python-lists-vs-numpy-arrays/
 19.05.2025  
 
 https://realpython.com/queue-in-python/
+
+
+07.07.2025
+
+1. ch06/01_main-chapter-code/ch06.ipynb 6.5
+
+2. Հավանականության գրքից, 2.2
