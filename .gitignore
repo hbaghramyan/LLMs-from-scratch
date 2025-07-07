@@ -1,7 +1,6 @@
 sms_spam_collection.zip
-sms_spam_collection/readme
-sms_spam_collection/SMSSpamCollection.tsv
 *.csv
+sms_spam_collection
 
 # Configs and keys
 ch05/07_gpt_to_llama/config.json
