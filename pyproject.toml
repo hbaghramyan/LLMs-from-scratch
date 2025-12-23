@@ -31,9 +31,6 @@ dev = [
     "twine>=6.1.0",
 ]
 
-[tool.ruff]
-line-length = 140
-
 [tool.ruff.lint]
 exclude = [".venv"]
 # Ignored rules (W504 removed)
