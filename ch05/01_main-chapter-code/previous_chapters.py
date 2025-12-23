@@ -10,7 +10,7 @@
 import tiktoken
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 #####################################
 # Chapter 2
@@ -241,7 +241,6 @@ class GPTModel(nn.Module):
 def generate_text_simple(model, idx, max_new_tokens, context_size):
     # idx is (B, T) array of indices in the current context
     for _ in range(max_new_tokens):
-
         # Crop current context if it exceeds the supported context size
         # E.g., if LLM supports only 5 tokens, and the context size is 10
         # then only the last 5 tokens are used as context
@@ -265,7 +264,6 @@ def generate_text_simple(model, idx, max_new_tokens, context_size):
 
 
 if __name__ == "__main__":
-
     GPT_CONFIG_124M = {
         "vocab_size": 50257,  # Vocabulary size
         "context_length": 1024,  # Context length
@@ -286,7 +284,7 @@ if __name__ == "__main__":
     encoded = tokenizer.encode(start_context)
     encoded_tensor = torch.tensor(encoded).unsqueeze(0)
 
-    print(f"\n{50*'='}\n{22*' '}IN\n{50*'='}")
+    print(f"\n{50 * '='}\n{22 * ' '}IN\n{50 * '='}")
     print("\nInput text:", start_context)
     print("Encoded input text:", encoded)
     print("encoded_tensor.shape:", encoded_tensor.shape)
@@ -299,7 +297,7 @@ if __name__ == "__main__":
     )
     decoded_text = tokenizer.decode(out.squeeze(0).tolist())
 
-    print(f"\n\n{50*'='}\n{22*' '}OUT\n{50*'='}")
+    print(f"\n\n{50 * '='}\n{22 * ' '}OUT\n{50 * '='}")
     print("\nOutput:", out)
     print("Output length:", len(out[0]))
     print("Output text:", decoded_text)

@@ -5,9 +5,10 @@
 
 import os
 import json
-import urllib.request
+import re
 from pathlib import Path
 
+import requests
 import torch
 import torch.nn as nn
 
@@ -21,7 +22,7 @@ QWEN_CONFIG_06_B = {
     "n_layers": 28,                  # Number of layers
     "hidden_dim": 3072,              # Size of the intermediate dimension in FeedForward
     "head_dim": 128,                 # Size of the heads in GQA
-    "qk_norm": True,                 # Whether to normalize queries and values in GQA
+    "qk_norm": True,                 # Whether to normalize queries and keys in GQA
     "n_kv_groups": 8,                # Key-Value groups for grouped-query attention
     "rope_base": 1_000_000.0,        # The base in RoPE's "theta"
     "dtype": torch.bfloat16,         # Lower-precision dtype to reduce memory usage
@@ -63,8 +64,8 @@ QWEN3_CONFIG_8B = {
     "context_length": 40_960,
     "emb_dim": 4096,                 # 60% larger than above
     "n_heads": 32,
-    "n_layers": 36,                  # 26% larger than above
-    "hidden_dim": 12288,
+    "n_layers": 36,
+    "hidden_dim": 12288,             # 26% larger than above
     "head_dim": 128,
     "qk_norm": True,
     "n_kv_groups": 8,
@@ -101,6 +102,23 @@ QWEN3_CONFIG_32B = {
         "dtype": torch.bfloat16,
 }
 
+# Mixture of Experts Model
+QWEN3_CONFIG_30B_A3B = {
+    "vocab_size": 151_936,
+    "context_length": 262_144,
+    "emb_dim": 2048,
+    "n_heads": 32,
+    "n_layers": 48,
+    "head_dim": 128,
+    "qk_norm": True,
+    "n_kv_groups": 4,
+    "rope_base": 10_000_000.0,
+    "dtype": torch.bfloat16,
+    "num_experts": 128,
+    "num_experts_per_tok": 8,
+    "moe_intermediate_size": 768,
+}
+
 
 class Qwen3Model(nn.Module):
     def __init__(self, cfg):
@@ -115,7 +133,7 @@ class Qwen3Model(nn.Module):
         self.final_norm = RMSNorm(cfg["emb_dim"])
         self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False, dtype=cfg["dtype"])
 
-        # Reusuable utilities
+        # Reusable utilities
         if cfg["head_dim"] is None:
             head_dim = cfg["emb_dim"] // cfg["n_heads"]
         else:
@@ -155,7 +173,10 @@ class TransformerBlock(nn.Module):
             qk_norm=cfg["qk_norm"],
             dtype=cfg["dtype"]
         )
-        self.ff = FeedForward(cfg)
+        if "num_experts" in cfg and cfg["num_experts"] > 0:
+            self.ff = MoEFeedForward(cfg)
+        else:
+            self.ff = FeedForward(cfg)
         self.norm1 = RMSNorm(cfg["emb_dim"], eps=1e-6)
         self.norm2 = RMSNorm(cfg["emb_dim"], eps=1e-6)
 
@@ -187,6 +208,59 @@ class FeedForward(nn.Module):
         x_fc2 = self.fc2(x)
         x = nn.functional.silu(x_fc1) * x_fc2
         return self.fc3(x)
+
+
+class MoEFeedForward(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.num_experts_per_tok = cfg["num_experts_per_tok"]
+        self.num_experts = cfg["num_experts"]
+        self.emb_dim = cfg["emb_dim"]
+        self.gate = nn.Linear(cfg["emb_dim"], cfg["num_experts"], bias=False, dtype=cfg["dtype"])
+
+        self.fc1 = nn.ModuleList([nn.Linear(cfg["emb_dim"], cfg["moe_intermediate_size"], bias=False, dtype=cfg["dtype"])
+                                  for _ in range(cfg["num_experts"])])
+        self.fc2 = nn.ModuleList([nn.Linear(cfg["emb_dim"], cfg["moe_intermediate_size"], bias=False, dtype=cfg["dtype"])
+                                  for _ in range(cfg["num_experts"])])
+        self.fc3 = nn.ModuleList([nn.Linear(cfg["moe_intermediate_size"], cfg["emb_dim"], bias=False, dtype=cfg["dtype"])
+                                  for _ in range(cfg["num_experts"])])
+
+    def forward(self, x):
+        scores = self.gate(x)  # (b, seq_len, num_experts)
+        topk_scores, topk_indices = torch.topk(scores, self.num_experts_per_tok, dim=-1)
+        topk_probs = torch.softmax(topk_scores, dim=-1)
+
+        batch, seq_len, _ = x.shape
+        x_flat = x.reshape(batch * seq_len, -1)
+        out_flat = torch.zeros(batch * seq_len, self.emb_dim, device=x.device, dtype=x.dtype)
+
+        topk_indices_flat = topk_indices.reshape(-1, self.num_experts_per_tok)
+        topk_probs_flat = topk_probs.reshape(-1, self.num_experts_per_tok)
+
+        unique_experts = torch.unique(topk_indices_flat)
+
+        for expert_id_tensor in unique_experts:
+            expert_id = int(expert_id_tensor.item())
+            mask = topk_indices_flat == expert_id
+            if not mask.any():
+                continue
+
+            token_mask = mask.any(dim=-1)
+            selected_idx = token_mask.nonzero(as_tuple=False).squeeze(-1)
+            if selected_idx.numel() == 0:
+                continue
+
+            expert_input = x_flat.index_select(0, selected_idx)
+            hidden = torch.nn.functional.silu(self.fc1[expert_id](expert_input)) * self.fc2[expert_id](expert_input)
+            expert_out = self.fc3[expert_id](hidden)
+
+            mask_selected = mask[selected_idx]
+            slot_indices = mask_selected.int().argmax(dim=-1, keepdim=True)
+            selected_probs = torch.gather(topk_probs_flat.index_select(0, selected_idx), dim=-1, index=slot_indices).squeeze(-1)
+
+            out_flat.index_add_(0, selected_idx, expert_out * selected_probs.unsqueeze(-1))
+
+        return out_flat.reshape(batch, seq_len, self.emb_dim)
 
 
 class GroupedQueryAttention(nn.Module):
@@ -255,6 +329,58 @@ class GroupedQueryAttention(nn.Module):
         return self.out_proj(context)
 
 
+# ==============================================================================
+# RoPE implementation summary
+#
+#
+# There are two common styles to implement RoPE, which are
+# mathematically equivalent;
+# they mainly differ in how the rotation matrix pairs dimensions.
+#
+# 1) Split-halves style (this repo, Hugging Face Transformers):
+#
+#   For hidden dim d = 8 (example):
+#
+#       [ x0   x1   x2   x3   x4   x5   x6   x7 ]
+#         │    │    │    │    │    │    │    │
+#         ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼
+#        cos  cos  cos  cos  sin  sin  sin  sin
+#
+#   Rotation matrix:
+#
+#       [ cosθ   -sinθ    0      0   ... ]
+#       [ sinθ    cosθ    0      0   ... ]
+#       [  0       0    cosθ   -sinθ ... ]
+#       [  0       0    sinθ    cosθ ... ]
+#        ...
+#
+#   Here, the embedding dims are split into two halves and then
+#   each one is rotated in blocks.
+#
+#
+# 2) Interleaved (even/odd) style (original paper, Llama repo):
+#
+#   For hidden dim d = 8 (example):
+#
+#       [ x0   x1   x2   x3   x4   x5   x6   x7 ]
+#         │    │    │    │    │    │    │    │
+#         ▼    ▼    ▼    ▼    ▼    ▼    ▼    ▼
+#        cos  sin  cos  sin  cos  sin  cos  sin
+#
+#   Rotation matrix:
+#       [ cosθ  -sinθ    0      0   ... ]
+#       [ sinθ   cosθ    0      0   ... ]
+#       [  0      0    cosθ   -sinθ ... ]
+#       [  0      0    sinθ    cosθ ... ]
+#        ...
+#
+#   Here, embedding dims are interleaved as even/odd cosine/sine pairs.
+#
+# Both layouts encode the same relative positions; the only difference is how
+# dimensions are paired.
+# ==============================================================================
+
+
 def compute_rope_params(head_dim, theta_base=10_000, context_length=4096, dtype=torch.float32):
     assert head_dim % 2 == 0, "Embedding dimension must be even"
 
@@ -265,7 +391,7 @@ def compute_rope_params(head_dim, theta_base=10_000, context_length=4096, dtype=
     positions = torch.arange(context_length, dtype=dtype)
 
     # Compute the angles
-    angles = positions[:, None] * inv_freq[None, :]  # Shape: (context_length, head_dim // 2)
+    angles = positions.unsqueeze(1) * inv_freq.unsqueeze(0) # Shape: (context_length, head_dim // 2)
 
     # Expand angles to match the head_dim
     angles = torch.cat([angles, angles], dim=1)  # Shape: (context_length, head_dim)
@@ -326,7 +452,14 @@ def load_weights_into_qwen(model, param_config, params):
     def assign(left, right, tensor_name="unknown"):
         if left.shape != right.shape:
             raise ValueError(f"Shape mismatch in tensor '{tensor_name}'. Left: {left.shape}, Right: {right.shape}")
-        return torch.nn.Parameter(right.clone().detach() if isinstance(right, torch.Tensor) else torch.tensor(right))
+
+        with torch.no_grad():
+            if isinstance(right, torch.Tensor):
+                left.copy_(right)
+            else:
+                left.copy_(torch.as_tensor(right, dtype=left.dtype, device=left.device))
+
+        return left
 
     model.tok_emb.weight = assign(model.tok_emb.weight, params["model.embed_tokens.weight"], "model.embed_tokens.weight")
 
@@ -380,21 +513,49 @@ def load_weights_into_qwen(model, param_config, params):
         )
 
         # Feedforward weights
-        block.ff.fc1.weight = assign(
-            block.ff.fc1.weight,
-            params[f"model.layers.{l}.mlp.gate_proj.weight"],
-            f"model.layers.{l}.mlp.gate_proj.weight"
-        )
-        block.ff.fc2.weight = assign(
-            block.ff.fc2.weight,
-            params[f"model.layers.{l}.mlp.up_proj.weight"],
-            f"model.layers.{l}.mlp.up_proj.weight"
-        )
-        block.ff.fc3.weight = assign(
-            block.ff.fc3.weight,
-            params[f"model.layers.{l}.mlp.down_proj.weight"],
-            f"model.layers.{l}.mlp.down_proj.weight"
-        )
+        if param_config.get("num_experts", 0) > 0:
+            # Load router (gating) weights
+            block.ff.gate.weight = assign(
+                block.ff.gate.weight,
+                params[f"model.layers.{l}.mlp.gate.weight"],
+                f"model.layers.{l}.mlp.gate.weight"
+            )
+            # Load expert weights
+            for e in range(param_config["num_experts"]):
+                prefix = f"model.layers.{l}.mlp.experts.{e}"
+                block.ff.fc1[e].weight = assign(
+                    block.ff.fc1[e].weight,
+                    params[f"{prefix}.gate_proj.weight"],
+                    f"{prefix}.gate_proj.weight"
+                )
+                block.ff.fc2[e].weight = assign(
+                    block.ff.fc2[e].weight,
+                    params[f"{prefix}.up_proj.weight"],
+                    f"{prefix}.up_proj.weight"
+                )
+                block.ff.fc3[e].weight = assign(
+                    block.ff.fc3[e].weight,
+                    params[f"{prefix}.down_proj.weight"],
+                    f"{prefix}.down_proj.weight"
+                )
+
+        else:
+            block.ff.fc1.weight = assign(
+                block.ff.fc1.weight,
+                params[f"model.layers.{l}.mlp.gate_proj.weight"],
+                f"model.layers.{l}.mlp.gate_proj.weight"
+            )
+            block.ff.fc2.weight = assign(
+                block.ff.fc2.weight,
+                params[f"model.layers.{l}.mlp.up_proj.weight"],
+                f"model.layers.{l}.mlp.up_proj.weight"
+            )
+            block.ff.fc3.weight = assign(
+                block.ff.fc3.weight,
+                params[f"model.layers.{l}.mlp.down_proj.weight"],
+                f"model.layers.{l}.mlp.down_proj.weight"
+            )
+
         block.norm2.scale = assign(
             block.norm2.scale,
             params[f"model.layers.{l}.post_attention_layernorm.weight"],
@@ -404,56 +565,89 @@ def load_weights_into_qwen(model, param_config, params):
     # Final normalization and output head
     model.final_norm.scale = assign(model.final_norm.scale, params["model.norm.weight"], "model.norm.weight")
 
-    # Model uses weight tying, hence we reuse the embedding layer weights here
-    model.out_head.weight = assign(model.out_head.weight, params["model.embed_tokens.weight"], "model.embed_tokens.weight")
+    if "lm_head.weight" in params:
+        model.out_head.weight = assign(model.out_head.weight, params["lm_head.weight"], "lm_head.weight")
+    else:
+        model.out_head.weight = model.tok_emb.weight
+        print("Model uses weight tying.")
 
 
-class Qwen3Tokenizer():
-    def __init__(self, tokenizer_file_path="tokenizer.json",
-                 repo_id=None, apply_chat_template=True,
-                 add_generation_prompt=False, add_thinking=False):
+class Qwen3Tokenizer:
+    _SPECIALS = [
+        "<|endoftext|>",
+        "<|im_start|>", "<|im_end|>",
+        "<|object_ref_start|>", "<|object_ref_end|>",
+        "<|box_start|>", "<|box_end|>",
+        "<|quad_start|>", "<|quad_end|>",
+        "<|vision_start|>", "<|vision_end|>",
+        "<|vision_pad|>", "<|image_pad|>", "<|video_pad|>",
+        "<think>", "</think>"
+    ]
+    _SPLIT_RE = re.compile(r"(<\|[^>]+?\|>|<think>|</think>)")
+
+    def __init__(self, tokenizer_file_path="tokenizer.json", repo_id=None,
+                 apply_chat_template=True, add_generation_prompt=False, add_thinking=False):
         from tokenizers import Tokenizer
-        self.tokenizer_file_path = tokenizer_file_path
+
         self.apply_chat_template = apply_chat_template
         self.add_generation_prompt = add_generation_prompt
         self.add_thinking = add_thinking
 
-        tokenizer_file_path_obj = Path(tokenizer_file_path)
-        if not tokenizer_file_path_obj.is_file() and repo_id is not None:
-            _ = download_from_huggingface(
+        tok_file = Path(tokenizer_file_path)
+        if not tok_file.is_file() and repo_id:
+            download_from_huggingface(
                 repo_id=repo_id,
-                filename=str(tokenizer_file_path_obj.name),
-                local_dir=str(tokenizer_file_path_obj.parent.name)
+                filename=tok_file.name,
+                local_dir=str(tok_file.parent),
             )
-        self.tokenizer = Tokenizer.from_file(tokenizer_file_path)
+        self._tok = Tokenizer.from_file(str(tok_file))
+        self._special_to_id = {}
+        for t in self._SPECIALS:
+            tid = self._tok.token_to_id(t)
+            if tid is not None:
+                self._special_to_id[t] = tid
 
-    def encode(self, prompt):
-        if self.apply_chat_template:
-            messages = [{"role": "user", "content": prompt}]
-            formatted_prompt = self.format_qwen_chat(
-                messages,
-                add_generation_prompt=self.add_generation_prompt,
-                add_thinking=self.add_thinking
-            )
+        self.pad_token_id = self._special_to_id["<|endoftext|>"]
+        self.eos_token_id = self.pad_token_id
+
+        if repo_id and "Base" not in repo_id:
+            eos_token = "<|im_end|>"
         else:
-            formatted_prompt = prompt
-        return self.tokenizer.encode(formatted_prompt).ids
+            eos_token = "<|endoftext|>"
+        if eos_token in self._special_to_id:
+            self.eos_token_id = self._special_to_id[eos_token]
 
-    def decode(self, token_ids):
-        return self.tokenizer.decode(token_ids, skip_special_tokens=False)
+    def encode(self, text, chat_wrapped=None):
+        if chat_wrapped is None:
+            chat_wrapped = self.apply_chat_template
 
-    @staticmethod
-    def format_qwen_chat(messages, add_generation_prompt=False, add_thinking=False):
-        prompt = ""
-        for msg in messages:
-            prompt += f"<|im_start|>{msg['role']}\n{msg['content']}<|im_end|>\n"
-        if add_generation_prompt:
-            prompt += "<|im_start|>assistant"
-            if add_thinking:
-                prompt += "\n"  # no <think> tags
+        stripped = text.strip()
+        if stripped in self._special_to_id and "\n" not in stripped:
+            return [self._special_to_id[stripped]]
+
+        if chat_wrapped:
+            text = self._wrap_chat(text)
+
+        ids = []
+        for part in filter(None, self._SPLIT_RE.split(text)):
+            if part in self._special_to_id:
+                ids.append(self._special_to_id[part])
             else:
-                prompt += "\n<think>\n\n</think>\n\n"
-        return prompt
+                ids.extend(self._tok.encode(part).ids)
+        return ids
+
+    def decode(self, ids):
+        return self._tok.decode(ids, skip_special_tokens=False)
+
+    def _wrap_chat(self, user_msg):
+        s = f"<|im_start|>user\n{user_msg}<|im_end|>\n"
+        if self.add_generation_prompt:
+            s += "<|im_start|>assistant"
+            if self.add_thinking:
+                s += "\n"
+            else:
+                s += "\n<think>\n\n</think>\n\n"
+        return s
 
 
 def download_from_huggingface(repo_id, filename, local_dir, revision="main"):
@@ -466,7 +660,12 @@ def download_from_huggingface(repo_id, filename, local_dir, revision="main"):
         print(f"File already exists: {dest_path}")
     else:
         print(f"Downloading {url} to {dest_path}...")
-        urllib.request.urlretrieve(url, dest_path)
+        response = requests.get(url, stream=True, timeout=60)
+        response.raise_for_status()
+        with open(dest_path, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
 
     return dest_path
 

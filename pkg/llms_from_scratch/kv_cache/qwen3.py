@@ -29,7 +29,7 @@ class Qwen3Model(nn.Module):
         self.final_norm = RMSNorm(cfg["emb_dim"])
         self.out_head = nn.Linear(cfg["emb_dim"], cfg["vocab_size"], bias=False, dtype=cfg["dtype"])
 
-        # Reusuable utilities
+        # Reusable utilities
         if cfg["head_dim"] is None:
             head_dim = cfg["emb_dim"] // cfg["n_heads"]
         else:
@@ -44,13 +44,13 @@ class Qwen3Model(nn.Module):
         self.cfg = cfg
         self.current_pos = 0  # Track current position in KV cache
 
-    def forward(self, in_idx, use_cache=False, cache=None):
+    def forward(self, in_idx, cache=None):
         # Forward pass
         tok_embeds = self.tok_emb(in_idx)
         x = tok_embeds
 
         num_tokens = x.shape[1]
-        if use_cache:
+        if cache is not None:
             pos_start = self.current_pos
             pos_end = pos_start + num_tokens
             self.current_pos = pos_end
@@ -65,16 +65,13 @@ class Qwen3Model(nn.Module):
         # Shape (1, 1, num_tokens, num_tokens) to broadcast across batch and heads
         mask = mask[None, None, :, :]
 
-        next_cache = []
         for i, block in enumerate(self.trf_blocks):
             blk_cache = cache.get(i) if cache else None
             x, new_blk_cache = block(x, mask, self.cos, self.sin,
-                                     use_cache=use_cache,
                                      start_pos=pos_start,
                                      cache=blk_cache)
-            if cache:
+            if cache is not None:
                 cache.update(i, new_blk_cache)
-            next_cache.append(new_blk_cache)
 
         x = self.final_norm(x)
         logits = self.out_head(x.to(self.cfg["dtype"]))
@@ -95,15 +92,18 @@ class TransformerBlock(nn.Module):
             qk_norm=cfg["qk_norm"],
             dtype=cfg["dtype"]
         )
-        self.ff = FeedForward(cfg)
+        if "num_experts" in cfg and cfg["num_experts"] > 0:
+            self.ff = MoEFeedForward(cfg)
+        else:
+            self.ff = FeedForward(cfg)
         self.norm1 = RMSNorm(cfg["emb_dim"], eps=1e-6)
         self.norm2 = RMSNorm(cfg["emb_dim"], eps=1e-6)
 
-    def forward(self, x, mask, cos, sin, use_cache=False, start_pos=0, cache=None):
+    def forward(self, x, mask, cos, sin, start_pos=0, cache=None):
         # Shortcut connection for attention block
         shortcut = x
         x = self.norm1(x)
-        x, next_cache = self.att(x, mask, cos, sin, use_cache=use_cache, start_pos=start_pos, cache=cache)  # Shape [batch_size, num_tokens, emb_size]
+        x, next_cache = self.att(x, mask, cos, sin, start_pos=start_pos, cache=cache)  # Shape [batch_size, num_tokens, emb_size]
         x = x + shortcut  # Add the original input back
 
         # Shortcut connection for feed-forward block
@@ -127,6 +127,59 @@ class FeedForward(nn.Module):
         x_fc2 = self.fc2(x)
         x = nn.functional.silu(x_fc1) * x_fc2
         return self.fc3(x)
+
+
+class MoEFeedForward(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.num_experts_per_tok = cfg["num_experts_per_tok"]
+        self.num_experts = cfg["num_experts"]
+        self.emb_dim = cfg["emb_dim"]
+        self.gate = nn.Linear(cfg["emb_dim"], cfg["num_experts"], bias=False, dtype=cfg["dtype"])
+
+        self.fc1 = nn.ModuleList([nn.Linear(cfg["emb_dim"], cfg["moe_intermediate_size"], bias=False, dtype=cfg["dtype"])
+                                  for _ in range(cfg["num_experts"])])
+        self.fc2 = nn.ModuleList([nn.Linear(cfg["emb_dim"], cfg["moe_intermediate_size"], bias=False, dtype=cfg["dtype"])
+                                  for _ in range(cfg["num_experts"])])
+        self.fc3 = nn.ModuleList([nn.Linear(cfg["moe_intermediate_size"], cfg["emb_dim"], bias=False, dtype=cfg["dtype"])
+                                  for _ in range(cfg["num_experts"])])
+
+    def forward(self, x):
+        scores = self.gate(x)  # (b, seq_len, num_experts)
+        topk_scores, topk_indices = torch.topk(scores, self.num_experts_per_tok, dim=-1)
+        topk_probs = torch.softmax(topk_scores, dim=-1)
+
+        batch, seq_len, _ = x.shape
+        x_flat = x.reshape(batch * seq_len, -1)
+        out_flat = torch.zeros(batch * seq_len, self.emb_dim, device=x.device, dtype=x.dtype)
+
+        topk_indices_flat = topk_indices.reshape(-1, self.num_experts_per_tok)
+        topk_probs_flat = topk_probs.reshape(-1, self.num_experts_per_tok)
+
+        unique_experts = torch.unique(topk_indices_flat)
+
+        for expert_id_tensor in unique_experts:
+            expert_id = int(expert_id_tensor.item())
+            mask = topk_indices_flat == expert_id
+            if not mask.any():
+                continue
+
+            token_mask = mask.any(dim=-1)
+            selected_idx = token_mask.nonzero(as_tuple=False).squeeze(-1)
+            if selected_idx.numel() == 0:
+                continue
+
+            expert_input = x_flat.index_select(0, selected_idx)
+            hidden = torch.nn.functional.silu(self.fc1[expert_id](expert_input)) * self.fc2[expert_id](expert_input)
+            expert_out = self.fc3[expert_id](hidden)
+
+            mask_selected = mask[selected_idx]
+            slot_indices = mask_selected.int().argmax(dim=-1, keepdim=True)
+            selected_probs = torch.gather(topk_probs_flat.index_select(0, selected_idx), dim=-1, index=slot_indices).squeeze(-1)
+
+            out_flat.index_add_(0, selected_idx, expert_out * selected_probs.unsqueeze(-1))
+
+        return out_flat.reshape(batch, seq_len, self.emb_dim)
 
 
 class GroupedQueryAttention(nn.Module):
@@ -159,7 +212,7 @@ class GroupedQueryAttention(nn.Module):
         else:
             self.q_norm = self.k_norm = None
 
-    def forward(self, x, mask, cos, sin, use_cache=False, start_pos=0, cache=None):
+    def forward(self, x, mask, cos, sin, start_pos=0, cache=None):
         b, num_tokens, _ = x.shape
 
         # Apply projections
@@ -182,18 +235,15 @@ class GroupedQueryAttention(nn.Module):
         queries = apply_rope(queries, cos, sin, offset=start_pos)
         keys_new = apply_rope(keys_new, cos, sin, offset=start_pos)
 
-        if use_cache:
-            if cache is None:
-                keys = keys_new
-                values = values_new
-            else:
-                prev_k, prev_v = cache
-                keys = torch.cat([prev_k, keys_new], dim=2)
-                values = torch.cat([prev_v, values_new], dim=2)
+        if cache is not None:
+            prev_k, prev_v = cache
+            keys = torch.cat([prev_k, keys_new], dim=2)
+            values = torch.cat([prev_v, values_new], dim=2)
             next_cache = (keys, values)
         else:
+            start_pos = 0  # reset RoPE
             keys, values = keys_new, values_new
-            next_cache = None
+            next_cache = (keys, values)
 
         # Expand K and V to match number of heads
         keys = keys.repeat_interleave(self.group_size, dim=1)
